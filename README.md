@@ -1,4 +1,5 @@
-
+## Whole Genome Sequencing
+Scripts: Delta Smelt WGS pipeline.Rmd (View the online version: https://html-preview.github.io/?url=https://github.com/JoannaGriffiths/DeltaSmelt_Genetics/blob/main/Delta-Smelt-WGS-pipeline.html)
 
 ## Funding Acknowledgements:
 This research was supported by the California Department of Fish and Wildlife (Prop 1:
