@@ -25,12 +25,6 @@ gwas <- read.delim2("DI_all_chr_offspring_lmm4_fixed_tank_reartemp.assoc.txt", h
 gwas <- read.delim2("FL_all_chr_offspring_lmm4_fixed_tank_reartemp.assoc.txt", header=T)
 gwas <- read.delim2("gxe_FL_all_chr_offspring_lmm4.assoc.txt", header=T)
 
-## CTM-FL mv
-gwas <- read.delim2("mvCTM_FL_all_chr_offspring_lmm4_fixed_tank_reartemp.assoc.txt", header=T)
-
-## CTM-DI mv
-gwas <- read.delim2("mvCTM_DI_all_chr_offspring_lmm4_fixed_tank_reartemp.assoc.txt", header=T)
-
 ## CTM-DI PLACO results
 gwas <- read.delim2("placo_results_correlated.txt", header=T)
 snps <- read.delim2("gwas_ctm_DI_shared_snps", header=T)
@@ -48,7 +42,7 @@ snps$chr <- paste(snps$chr1, snps$chr2, sep="_")
 gwas_snps <- cbind(gwas, snps)
 gwas <- gwas_snps[c(14,6,3)]
 
-## check there are no z-scores above 80 in both datasets
+## check there are no z-scores above 80 in both datasets before running placo+
 gwas <- read.delim2("gwas_summary_gxe.txt", header=F)
 gwas$V2 <- as.numeric(gwas$V2)
 gwas$V4 <- as.numeric(gwas$V4)
@@ -89,30 +83,7 @@ snps$chr <- paste(snps$chr1, snps$chr2, sep="_")
 gwas_snps <- cbind(gwas, snps)
 gwas <- gwas_snps[c(9,6,3)]
 
-
-####################### format only for ldsc
-gwas <- gwas[,c(2,5,6,4,13,8)]
-
-gwas$sample <- 1223476 - gwas$n_miss #ctmax genotype
-gwas$sample <- 1223467 - gwas$n_miss #ctm gxe, FL
-gwas$sample <- 1224047 - gwas$n_miss #DI gwas
-
-gwas <- gwas[,c(1,2,3,7,5,6)]
-colnames(gwas) <- c("SNP", "A1", "A2", "N", "P", "Z")
-
-gwas2 <- gwas %>%
-  separate(col = SNP, into = c("SNP", "Remove"), sep = ":")
-gwas <- gwas2[,c(1,3,4,5,6,7)]
-
-write.table(gwas,file = "gwas_ctmax_genotype_ldsc", quote = F,row.names = F,col.names = T, sep = "\t")
-write.table(gwas,file = "gwas_ctmax_gxe_ldsc", quote = F,row.names = F,col.names = T, sep = "\t")
-write.table(gwas,file = "gwas_DI_ldsc", quote = F,row.names = F,col.names = T, sep = "\t")
-write.table(gwas,file = "gwas_FL_ldsc", quote = F,row.names = F,col.names = T, sep = "\t")
-write.table(gwas,file = "gwas_FL_gxe_ldsc", quote = F,row.names = F,col.names = T, sep = "\t")
-
-#############################
-
-
+##########################################################################
 
 gwas <- gwas[,c(1,2,3,13)]
 
@@ -182,25 +153,24 @@ write.table(top_300,file = "gwas_top300_for_LDannot_DI", quote = F,row.names = F
 write.table(top_300,file = "gwas_top300_for_LDannot_FL", quote = F,row.names = F,col.names = T, sep = "\t")
 write.table(top_300,file = "gwas_top300_for_LDannot_FL_gxe", quote = F,row.names = F,col.names = T, sep = "\t")
 
-####LD-annot changes
+###############################
+#### Changes made to LD-annot code
+############################
 L328 old: dics[z] = [(int(j[1]) - mean) , (int(j[1]) + mean)]
 L335 and L336:
   up = int(max(dics[i]))
 down = int(min(dics[i]))
 L340 old: if int(l[1]) < down < int(l[2]) or int(l[1]) < up < int(l[2]) or down < int(l[1]) < up or down < int(l[2]) < up :
 
-## on the command line before running LD-annot
+## run on the command line for input files before running LD-annot
 for all files:
 `:%s/NC_/NC/g`
 `:%s/NW_/NW/g`
 
 
-#####################
-##Make manhattan plot
-#####################
-#gwas$chr <- gsub("NC_","",as.character(gwas$chr))
-#gwas$chr <- gsub("NW_","",as.character(gwas$chr))
-#gwas$chr <- gsub(".1","",as.character(gwas$chr))s
+##################################
+#######  Fix Chromosome names
+###############################
 
 names <- read.delim2("DS_chr_num_names.txt", header=F)
 colnames(names) <- c("chr_num", "chr")
@@ -209,16 +179,18 @@ gwas2 <- merge(gwas, names, by="chr", all.x = T)
 rm(gwas)
 
 gwas2$chr <- as.numeric(gwas2$chr)
-#gwas2$rs <- as.numeric(gwas2$rs)
 gwas2$ps <- as.numeric(gwas2$ps)
 gwas2$p_wald <- as.numeric(gwas2$p_wald)
 gwas2$P_wald_log <- (-log10(gwas2$p_wald))
 gwas2$p.placo.plus <- as.numeric(gwas2$p.placo.plus)
-#gwas2$P_wald_log <- (-log10(gwas2$p.placo.plus)) #for placo results
-#gwas2$SNP <- as.numeric(gwas2$SNP)
+gwas2$P_wald_log <- (-log10(gwas2$p.placo.plus)) #for placo results
+gwas2$SNP <- as.numeric(gwas2$SNP)
 gwas2$snp <- paste(gwas2$chr_num, gwas2$ps, sep = "_")
 
-######## bonferroni corrections for each chromosome
+##############################################
+### bonferroni corrections for each chromosome
+###################################################
+
 snps_chr <- gwas2 %>%
   group_by(chr_num) %>%
   count(chr_num)
@@ -295,8 +267,9 @@ save(sig_vec_0.05, sig_vec_0.1, file = "CTM-FL_chr_sig.RData")
 save(sig_vec_0.05, sig_vec_0.1, file = "CTM-DI_chr_sig.RData")
 
 
-
-################## Create LD-annot input, don't run before manhattan plots
+##########################
+##### Create LD-annot input, don't run before manhattan plots
+##########################
 load("chr_sig.RData")
 load("chr_sig_gxe.RData")
 load("DI_chr_sig.RData")
@@ -363,8 +336,9 @@ for all files:
   `:%s/NC_/NC/g`
 `:%s/NW_/NW/g`
 
-
+#######################
 ####### sig overlap
+######################
 ctm_sig_vec_0.05 <- sig_vec_0.05
 ctm_sig_vec_0.1 <- sig_vec_0.1
 
@@ -394,11 +368,8 @@ table(overlap4) #0 overlap
 
 
 ################################
-
-
-
-
 ### Manhattan Plots
+################################
 ## CTM
 windows()
 manhattan(gwas2, chr="chr_num", snp="snp", bp="ps", p="p_wald", suggestiveline = -log10(0.05/1223476), genomewideline = 4, highlight = sig_vec_0.05, logp = T) #7.39 #OG
@@ -465,10 +436,10 @@ manhattan(gwas2, chr="chr", snp="ps", bp="ps", p="p_wald", suggestiveline = -log
 
 
 
-###################
+
 
 ###########################
-### R script to do GO
+### R script to do GO functional enrichment
 ###########################
 
 setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/GWAS")
@@ -705,17 +676,13 @@ table(overlap) #2
 save(Fst_gene_ids, DI_gene_ids, ctm0.05_gene_ids, ctmlog3.5_gene_ids, gxe_gene_ids, FLlog3.5_gene_ids, FL_gxe_gene_ids, ctm_DI_gene_ids, ctm_FL_gene_ids,ctm_top300_gene_ids,ctm_gxe_top300_gene_ids,DI_top300_gene_ids,FL_top300_gene_ids,FL_gxe_top300_gene_ids, file="gwas_gene_ids.RData")
 
 
-#make a venn diagram of num of overlapping genes next?
+
 ####################################################
+## GO functional enrichment continued
+#################################################
 
 #keep only unique gene IDs from biomaRt--but which GO term gets chosen, I think it get's chosen in topGO later
 all.genes <- sort(unique(as.character(GTOGO$external_gene_name)))
-
-
-#write.table(all.genes,file = "all.genes", quote = F,row.names = F,col.names = T, sep = "\t")
-
-#filter all gene list to only include those from LD-annot
-#cands.df <-subset(all.genes, all.genes %in% LDannot_gene_ids$gene_id)
 
 cands.chr <-as.character(int.genes.df$gene_id)
 
@@ -726,7 +693,6 @@ table(int.genes)
 
 library(data.table)
 int.genes.df <- data.table(int.genes)
-#write.table(int.genes,file = "int.genes", quote = F,row.names = F,col.names = T, sep = "\t")
 
 # #create GO object (for running in topGO!)
 library(topGO)
@@ -805,43 +771,3 @@ write.csv(filt.all,"GO.gwas.gxe.FL.csv") #14
 
 write.csv(filt.all,"GO.gwas.Fst_top0.3.csv") #10
 
-
-##########################
-#heat related genes from tippytop GWAS
-###########################
-	
-GO:0009408 response to heat
-GO:0010286 heat acclimation
-GO:0034605 cellular response to heat
-GO:0070370 cellular heat acclimation
-GO:1900034 regulation of cellular response to heat
-
-GO:0006950 response to stress
-GO:0033554 cellular response to stress
-
-GO:0009408 hsf1
-GO:0009408 dnaja3 
-GO:0009408 trpv1
-GO:0009408 DDX6
-GO:0009408 dnaja2a
-GO:0009408 hspb1
-GO:0009408 dnaja1
-GO:0009408 hsp70.1
-GO:0009408 dnaja3a
-GO:0009408 dnaja2b
-GO:0009408 hsp90aa1.2
-
-GO:0034605 hsp90aa1.2
-
-GO:0070370 hsbp1a
-
-GO:1900034 DHX30
-
-GO:0033554 derl3
-GO:0033554 derl1
-GO:0033554 derl2
-
-
-###################
-#random effects colinear
-###################
