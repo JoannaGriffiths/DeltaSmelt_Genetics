@@ -1,0 +1,3970 @@
+---
+title: "Delta Smelt WGS pipeline"
+author: "Joanna Griffiths"
+date: "2023-03-14"
+output: 
+  html_document:
+    toc: true
+---
+
+## Sequence Data Download and Set Up
+### Download data from Genome Center
+
+example of how to download data with wget:
+
+```{bash eval=FALSE}
+wget -r -nH -nc -R index.html* http://slimsdata.genomecenter.ucdavis.edu/Data/d0eto3hehv/Un_DTSA688/Project_AWJG_AWJG_B/
+```
+
+
+parets not sequenced:
+OH58_2 (PC:213)
+YO94_2 (PC:84)
+YO96_2 (PC: 83)
+OJ52_1 (PC: 231)
+OB95_2 (PC: 155)
+
+### Demultiplexing from Plates to wells
+
+below code didn't work
+took too long and internet connection reset and it wasn't working anyway, so I emailed the HPC help desk and they installed it for me in less than 15min
+```{bash eval=FALSE}
+module load conda3/1.0
+conda install -c bioconda fgbio=1.3.0
+```
+
+run demultiplex.sh on cluster:
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=P4demux
+#SBATCH --mem=4G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_P4demux.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_P4demux.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p med
+
+module load fgbio/2.1.0
+source activate fgbio-2.1.0
+
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+	--inputs \
+	DS_JG_01_S1_L001_R1_001.fastq.gz \
+	DS_JG_01_S1_L001_R2_001.fastq.gz \
+	--metadata Demux_SampleSheet_plate01.csv \
+	--read-structures 8B12S+T 8S+T \
+	--output plate01 \
+	--metrics plate01/demux_metrics.txt \
+	--threads $(nproc) \
+	--output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_02_S2_L001_R1_001.fastq.gz \
+        DS_JG_02_S2_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate02.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate02 \
+        --metrics plate02/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_03_S3_L001_R1_001.fastq.gz \
+        DS_JG_03_S3_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate03.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate03 \
+        --metrics plate03/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_04_S4_L001_R1_001.fastq.gz \
+        DS_JG_04_S4_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate04.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate04 \
+        --metrics plate04/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_05_S5_L001_R1_001.fastq.gz \
+        DS_JG_05_S5_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate05.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate05 \
+        --metrics plate05/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_A
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_06_S6_L001_R1_001.fastq.gz \
+        DS_JG_06_S6_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate06.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate06 \
+        --metrics plate06/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_07_S1_L002_R1_001.fastq.gz \
+        DS_JG_07_S1_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate07.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate07 \
+        --metrics plate07/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_08_S2_L002_R1_001.fastq.gz \
+        DS_JG_08_S2_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate08.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate08 \
+        --metrics plate08/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_09_S3_L002_R1_001.fastq.gz \
+        DS_JG_09_S3_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate09.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate09 \
+        --metrics plate09/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_10_S4_L002_R1_001.fastq.gz \
+        DS_JG_10_S4_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate10.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate10 \
+        --metrics plate10/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_11_S5_L002_R1_001.fastq.gz \
+        DS_JG_11_S5_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate09.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate11 \
+        --metrics plate11/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_B
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_12_S6_L002_R1_001.fastq.gz \
+        DS_JG_12_S6_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate09.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate12 \
+        --metrics plate12/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_13_S1_L001_R1_001.fastq.gz \
+        DS_JG_13_S1_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate13.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate13 \
+        --metrics plate13/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_14_S2_L001_R1_001.fastq.gz \
+        DS_JG_14_S2_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate14.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate14 \
+        --metrics plate14/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_15_S3_L001_R1_001.fastq.gz \
+        DS_JG_15_S3_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate15.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate15 \
+        --metrics plate15/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_16_S4_L001_R1_001.fastq.gz \
+        DS_JG_16_S4_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate16.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate16 \
+        --metrics plate16/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_17_S5_L001_R1_001.fastq.gz \
+        DS_JG_17_S5_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate17.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate17 \
+        --metrics plate17/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_18_S6_L001_R1_001.fastq.gz \
+        DS_JG_18_S6_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate18.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate18 \
+        --metrics plate18/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_C
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_19_S7_L001_R1_001.fastq.gz \
+        DS_JG_19_S7_L001_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate19.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate19 \
+        --metrics plate19/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_20_S1_L002_R1_001.fastq.gz \
+        DS_JG_20_S1_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate20.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate20 \
+        --metrics plate20/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        ATCACG_S8_L002_R1_001.fastq.gz \
+        ATCACG_S8_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate21.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate21 \
+        --metrics plate21/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_22_S3_L002_R1_001.fastq.gz \
+        DS_JG_22_S3_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate22.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate22 \
+        --metrics plate22/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_23_S4_L002_R1_001.fastq.gz \
+        DS_JG_23_S4_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate23.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate23 \
+        --metrics plate23/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_24_S5_L002_R1_001.fastq.gz \
+        DS_JG_24_S5_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate24.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate24 \
+        --metrics plate24/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_25_S6_L002_R1_001.fastq.gz \
+        DS_JG_25_S6_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate25.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate25 \
+        --metrics plate25/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_D
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_26_S7_L002_R1_001.fastq.gz \
+        DS_JG_26_S7_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate26.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate26 \
+        --metrics plate26/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_27_S1_L003_R1_001.fastq.gz \
+        DS_JG_27_S1_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate27.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate27 \
+        --metrics plate27/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_28_S2_L003_R1_001.fastq.gz \
+        DS_JG_28_S2_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate28.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate28 \
+        --metrics plate28/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_29_S3_L003_R1_001.fastq.gz \
+        DS_JG_29_S3_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate29.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate29 \
+        --metrics plate29/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_30_S4_L003_R1_001.fastq.gz \
+        DS_JG_30_S4_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate30.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate30 \
+        --metrics plate30/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_31_S5_L003_R1_001.fastq.gz \
+        DS_JG_31_S5_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate31.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate31 \
+        --metrics plate31/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_32_S6_L003_R1_001.fastq.gz \
+        DS_JG_32_S6_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate32.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate32 \
+        --metrics plate32/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_E
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_33_S7_L003_R1_001.fastq.gz \
+        DS_JG_33_S7_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_plate33.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plate33 \
+        --metrics plate33/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_P
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_P_S1_L004_R1_001.fastq.gz \
+        DS_JG_P_S1_L004_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_Lane1_P.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plateP1 \
+        --metrics plateP1/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_P_L2
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_P_S1_L002_R1_001.fastq.gz \
+        DS_JG_P_S1_L002_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_Lane2_P.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plateP2 \
+        --metrics plateP2/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_P_L3
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_P_S1_L003_R1_001.fastq.gz \
+        DS_JG_P_S1_L003_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_Lane3_P.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plateP3 \
+        --metrics plateP3/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+'''
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data/Project_AWJG_AWJG_P_L4
+fgbio -Xmx8G DemuxFastqs \
+        --inputs \
+        DS_JG_P_S1_L004_R1_001.fastq.gz \
+        DS_JG_P_S1_L004_R2_001.fastq.gz \
+        --metadata Demux_SampleSheet_Lane4_P.csv \
+        --read-structures 8B12S+T 8S+T \
+        --output plateP4 \
+        --metrics plateP4/demux_metrics.txt \
+        --threads $(nproc) \
+        --output-type Fastq
+
+conda deactivate
+
+date
+exit
+
+```
+This took about 4hrs per plate sample, so I ran it in chunks
+
+I got an error demultiplexing saying that the length of the sequencing read was not the same length as the quality, so I checked that the md5 sum was the same in the downloaded file from the genome center as well as the current file. You can check the current file with the following command:
+```{bash eval=FALSE}
+
+md5sum DS_JG_P_S1_L004_R1_001.fastq.gz
+#50828dfe546e88c4edd41b2763e07089
+#50828dfe546e88c4edd41b2763e07089 from md5file:
+
+md5sum DS_JG_P_S1_L004_R2_001.fastq.gz
+#3d61ee7ef7e3fd54f0e74de3eb1b14c2  fro md5file: DS_JG_P_S1_L004_R2_001.fastq.gz
+#428610444e513105e122713784d1e33a
+```
+
+### Combine all parent files into one file
+
+Because all parents were sequenced across 4 lanes of a NovaSeq I need to combine them into one
+Submit the following script as a job on the cluster:  combine_parents.sh
+I ran this as three jobs, first to unzip all the files, then at the same time, one for the forward reads and one for the reverse reads
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=cat
+#SBATCH --mem=4G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_cat.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_cat.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p med
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Data
+#gunzip Project_AWJG_AWJG_P/plateP1/*
+#gunzip Project_AWJG_AWJG_P_L2/plateP2/*
+#gunzip Project_AWJG_AWJG_P_L3/plateP3/*
+#gunzip Project_AWJG_AWJG_P_L4/plateP4/*
+
+cd all_parents
+cat well_names | parallel -j 10 "cat {}-Lane01_P-*_R1.fastq {}-Lane02_P-*_R1.fastq {}-Lane03_P-*_R1.fastq {}-Lane04_P-*_R1.fastq > {}_allLanes_P_R1.fastq"
+cat well_names | parallel -j 10 "cat {}-Lane01_P-*_R2.fastq {}-Lane02_P-*_R2.fastq {}-Lane03_P-*_R2.fastq {}-Lane04_P-*_R2.fastq > {}_allLanes_P_R2.fastq"
+```
+
+
+### Upload files to NCBI
+
+Since I have to upload in batches, the files need to be moved into directories for each batch upload:
+Can be done on the command line.
+```{bash, eval=FALSE}
+
+while IFS= read -r line; do
+mv ${line} NCBI_batch1/
+done < NCBI_batch1_files
+
+while IFS= read -r line; do
+mv ${line} NCBI_batch2/
+done < NCBI_batch2_files
+
+while IFS= read -r line; do
+mv ${line} NCBI_batch3/
+done < NCBI_batch3_files
+
+while IFS= read -r line; do
+mv ${line} NCBI_batch4/
+done < NCBI_batch4_files
+
+while IFS= read -r line; do
+mv ../all_parents/${line} NCBI_batch4/
+done < NCBI_batch4_files
+
+```
+
+Follow directions from NCBI for creating the Aspera command line connection.
+
+Submit script to upload: `sbatch ncbi.sh`
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=cat
+#SBATCH --mem=10G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_ncbi.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_ncbi.txt
+#SBATCH --time=120:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load aspera-cli/3.7.7
+
+cd  /group/awhitehegrp2/joanna/Smelt_WGS/Data/all_offspring
+
+ascp -i aspera_key.openssh -QT -l100m -k1 -d NCBI_batch1/ subasp@upload.ncbi.nlm.nih.gov:uploads/joanna.griffiths4_gmail.com_vkz0YItY
+
+ascp -i aspera_key.openssh -QT -l100m -k1 -d NCBI_batch2/ subasp@upload.ncbi.nlm.nih.gov:uploads/joanna.griffiths4_gmail.com_vkz0YItY
+
+date
+exit
+```
+
+
+
+## Genotype parents using snpArcher snakemake pipeline
+
+This is a cool pipeline for fastq files to vcf using the wrapper snakemake
+https://github.com/harvardinformatics/snpArcher
+I just downloaded the GitHub repository onto my desktop and scp it over to the cluster
+
+snakemake was already installed on the cluster but for some reason it wasn't evoking correctly, so I had to make my own personal snakemake environment:
+```{bash eval=FALSE}
+conda create -c bioconda -c conda-forge -n snakemake snakemake
+```
+
+
+Next, lets set up the samples.csv file that is input to snakemake. This can be done on the command line:
+```{bash eval=FALSE}
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/workflow/
+
+module load python3/3.7.4
+
+python3 write_samples.py -s /group/awhitehegrp2/joanna/Smelt_WGS/Data/all_parents/sample_list -f /group/awhitehegrp2/joanna/Smelt_WGS/Data/all_parents -o Hypomesus_transpacificus -r /group/awhitehegrp2/joanna/Smelt_WGS/GCF_021917145.1_fHypTra1_genomic.fna
+
+```
+**Note: The sample_list file is a list of all the samples labeled as so: A01_allLanes_P
+**Note: I couldn't get the newest version of the write_samples.py to work since they had recently updated it. So I downloaded version dated on Nov 2nd 2022 which is name write_samples.py in snpArcher directory. the newest version of the script which I donwloaded on 3/9/2023 is named write_samples2.py
+
+the error I was getting was: TypeError: write_sample_sheet() missing 1 required positional argument: 'ncbi_ref'
+
+Finally, I had to go into the samples.csv file to manually add a comma between the refPath and Run for each line.
+
+Edit the slurm profile so it knows which partitions to use on FARM:
+'vim snpArcher-main/profiles/slurm/cluster_config.yml'
+```{bash eval=FALSE}
+__default__:
+    partition: "high"
+    time: 9000
+    nodes: 1
+    mem: 1000
+    output: "/group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%sm_log.txt"
+```
+
+
+Edit the config/resources.yaml file: Change the number of threads used for bwa mapping since our cluster doesn't allow 31 threads per node. Changed to 16
+
+
+Edit the config/config.yaml file:
+```{bash eval=FALSE}
+##############################
+# Variables you need to change
+##############################
+
+samples: "config/samples.csv" # path to the sample metadata CSV
+resource_config: "config/resources.yaml" # path to resources yaml config
+final_prefix: "Smelt_Parents" # prefix for final output files
+intervals: True #Set to True if you want to perform variant calling using interval approach.
+sentieon: False #set to True if you want to use sentieon, False if you want GATK
+sentieon_lic: "" #set to path of sentieon license
+remote_reads: False # Set True if reads are in a Google Bucket seperate from --default-remote-prefix.
+remote_reads_prefix: "" # set to google bucket prefix where reads live
+bigtmp: "/group/awhitehegrp2/joanna/temp" #Set to a path with lots of free space to use for commands that require large amounts of temp space; defaults to system tmpdir if empty
+cov_filter: True #set to True if you want to include coverage thresholds in the callable sites bed file (default uses mappability only)
+
+```
+**Note: I also change the num_gvcf_intervals: to 200 instead of the default which was 50. Too few intervals caused a series of annoying errors below and I basically ended up rerunning everything.
+
+NOW we can run snakemake with script snakemake.sh:
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=sm
+#SBATCH --mem=16G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_snakemake.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_snakemake.txt
+#SBATCH --time=168:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load conda3/1.0
+source activate snakemake
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main
+snakemake --snakefile workflow/Snakefile --profile ./profiles/slurm --conda-frontend conda
+
+conda deactivate
+```
+
+In one error file: which is why I added the extra flag:
+The 'mamba' command is not available in the shell /bin/bash that will be used by Snakemake. You have to ensure that it is in your PATH, e.g., first activating the conda base environment with `conda activate base`.The mamba package manager (https://github.com/mamba-org/mamba) is a fast and robust conda replacement. It is the recommended way of using Snakemake's conda integration. It can be installed with `conda install -n base -c conda-forge mamba`. If you still prefer to use conda, you can enforce that by setting `--conda-frontend conda`
+
+reran again without --dryrun flag, dryrun just reports potential errors and commands/jobs it will run
+
+**Note that FARM had a major shut down and upgrade while I was in the middle of running snakemake. Older versions were deprecated and so I had to switch to newer versions, such as conda version 23.1.0. I ran `conda -V` to figure out what version it was running because now you just load the latest version of conda as so: `module load conda/base/latest`
+
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=sm
+#SBATCH --mem=16G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_snakemake.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_snakemake.txt
+#SBATCH --time=168:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load conda/base/latest
+source activate snakemake
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main
+snakemake --snakefile workflow/Snakefile --profile ./profiles/slurm --conda-frontend conda
+
+conda deactivate
+```
+
+
+### SNPArcher Errors
+The following are errors and how I fixed them. Note that these occurred before I changed the num_gvcf_intervals: to 200. With more intervals, none of the issues below occurred.
+
+For gatk DB intervals 281-307, I kept getting errors about variants have the same position in Gvcf file:
+see truncated file: /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/logs/GCF_021917145.1_fHypTra1_genomic/gatk_db_import/0281.txt
+```{bash eval=FALSE}
+
+16:38:04.485 INFO  GenomicsDBImport - Importing batch 3 with 25 samples
+16:39:31.034 INFO  GenomicsDBImport - Importing batch 3 with 25 samples
+terminate called after throwing an instance of 'VCF2TileDBException'
+  what():  VCF2TileDBException : Incorrect cell order found - cells must be in column major order. Previous cell: [ 56, 171409817 ] current cell: [ 56, 171409817 ].
+The most likely cause is unexpected data in the input file:
+(a) A VCF file has two lines with the same genomic position
+(b) An unsorted CSV file
+(c) Malqmed VCF file (or malformed index)
+See point 2 at: https://github.com/Intel-HLS/GenomicsDB/wiki/Importing-VCF-data-into-GenomicsDB#organizing-your-data
+
+```
+
+This link (https://gatk.broadinstitute.org/hc/en-us/community/posts/4403240487451-GenomicsDBImport-variants-have-the-same-position-in-Gvcf-file) suggests I should normalize the gvcf files. The issue seems to be on batch 3 of 25 samples (so these are samples C07, D07, E07...C10)
+
+So I ran the following script as a job
+http://samtools.github.io/bcftools/bcftools.html#norm
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=cat
+#SBATCH --mem=4G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_norm.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_norm.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/results/GCF_021917145.1_fHypTra1_genomic/gvcfs
+
+bcftools norm --multiallelics -any --output C07_allLanes_P.g.norm.vcf.gz C07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output D07_allLanes_P.g.norm.vcf.gz D07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output E07_allLanes_P.g.norm.vcf.gz E07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output F07_allLanes_P.g.norm.vcf.gz F07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output G07_allLanes_P.g.norm.vcf.gz G07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output H07_allLanes_P.g.norm.vcf.gz H07_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output A08_allLanes_P.g.norm.vcf.gz A08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output B08_allLanes_P.g.norm.vcf.gz B08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output C08_allLanes_P.g.norm.vcf.gz C08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output D08_allLanes_P.g.norm.vcf.gz D08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output E08_allLanes_P.g.norm.vcf.gz E08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output F08_allLanes_P.g.norm.vcf.gz F08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output G08_allLanes_P.g.norm.vcf.gz G08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output H08_allLanes_P.g.norm.vcf.gz H08_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output A09_allLanes_P.g.norm.vcf.gz A09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output B09_allLanes_P.g.norm.vcf.gz B09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output C09_allLanes_P.g.norm.vcf.gz C09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output D09_allLanes_P.g.norm.vcf.gz D09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output E09_allLanes_P.g.norm.vcf.gz E09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output F09_allLanes_P.g.norm.vcf.gz F09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output G09_allLanes_P.g.norm.vcf.gz G09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output H09_allLanes_P.g.norm.vcf.gz H09_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output A10_allLanes_P.g.norm.vcf.gz A10_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output B10_allLanes_P.g.norm.vcf.gz B10_allLanes_P.g.vcf.gz
+bcftools norm --multiallelics +any --output C10_allLanes_P.g.norm.vcf.gz C10_allLanes_P.g.vcf.gz
+
+##now use gatk to create the index (tbi file)
+#https://gatk.broadinstitute.org/hc/en-us/articles/360037428111-IndexFeatureFile
+
+module load conda/base/latest
+module load gatk/4.2.6.1
+module load jdk/17.0.1
+gatk IndexFeatureFile -I C07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I D07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I E07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I F07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I G07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I H07_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I B08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I C08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I D08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I E08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I F08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I G08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I H08_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I B09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I C09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I D09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I E09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I F09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I G09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I H09_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A10_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I B10_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I C10_allLanes_P.g.vcf.gz
+```
+
+I moved old files (e.g. C07_allLanes_P.g.vcf.gz and C07_allLanes_P.g.vcf.gz.tbi) to a directory labeled `unnorm`. Can be done on command line:
+```{bash eval=FALSE}
+mv C07_allLanes_P.g.norm.vcf.gz C07_allLanes_P.g.vcf.gz
+mv D07_allLanes_P.g.norm.vcf.gz D07_allLanes_P.g.vcf.gz
+mv E07_allLanes_P.g.norm.vcf.gz E07_allLanes_P.g.vcf.gz
+mv F07_allLanes_P.g.norm.vcf.gz F07_allLanes_P.g.vcf.gz
+mv G07_allLanes_P.g.norm.vcf.gz G07_allLanes_P.g.vcf.gz
+mv H07_allLanes_P.g.norm.vcf.gz H07_allLanes_P.g.vcf.gz #row 56
+mv A08_allLanes_P.g.norm.vcf.gz A08_allLanes_P.g.vcf.gz
+mv B08_allLanes_P.g.norm.vcf.gz B08_allLanes_P.g.vcf.gz
+mv C08_allLanes_P.g.norm.vcf.gz C08_allLanes_P.g.vcf.gz
+mv D08_allLanes_P.g.norm.vcf.gz D08_allLanes_P.g.vcf.gz
+mv E08_allLanes_P.g.norm.vcf.gz E08_allLanes_P.g.vcf.gz
+mv F08_allLanes_P.g.norm.vcf.gz F08_allLanes_P.g.vcf.gz
+mv G08_allLanes_P.g.norm.vcf.gz G08_allLanes_P.g.vcf.gz
+mv H08_allLanes_P.g.norm.vcf.gz H08_allLanes_P.g.vcf.gz
+mv A09_allLanes_P.g.norm.vcf.gz A09_allLanes_P.g.vcf.gz
+mv B09_allLanes_P.g.norm.vcf.gz B09_allLanes_P.g.vcf.gz
+mv C09_allLanes_P.g.norm.vcf.gz C09_allLanes_P.g.vcf.gz
+mv D09_allLanes_P.g.norm.vcf.gz D09_allLanes_P.g.vcf.gz
+mv E09_allLanes_P.g.norm.vcf.gz E09_allLanes_P.g.vcf.gz
+mv F09_allLanes_P.g.norm.vcf.gz F09_allLanes_P.g.vcf.gz
+mv G09_allLanes_P.g.norm.vcf.gz G09_allLanes_P.g.vcf.gz
+mv H09_allLanes_P.g.norm.vcf.gz H09_allLanes_P.g.vcf.gz
+mv A10_allLanes_P.g.norm.vcf.gz A10_allLanes_P.g.vcf.gz
+mv B10_allLanes_P.g.norm.vcf.gz B10_allLanes_P.g.vcf.gz
+mv C10_allLanes_P.g.norm.vcf.gz C10_allLanes_P.g.vcf.gz
+
+mv C07_allLanes_P.g.norm.vcf.gz.tbi C07_allLanes_P.g.vcf.gz.tbi
+mv D07_allLanes_P.g.norm.vcf.gz.tbi D07_allLanes_P.g.vcf.gz.tbi
+mv E07_allLanes_P.g.norm.vcf.gz.tbi E07_allLanes_P.g.vcf.gz.tbi
+mv F07_allLanes_P.g.norm.vcf.gz.tbi F07_allLanes_P.g.vcf.gz.tbi
+mv G07_allLanes_P.g.norm.vcf.gz.tbi G07_allLanes_P.g.vcf.gz.tbi
+mv H07_allLanes_P.g.norm.vcf.gz.tbi H07_allLanes_P.g.vcf.gz.tbi
+mv A08_allLanes_P.g.norm.vcf.gz.tbi A08_allLanes_P.g.vcf.gz.tbi
+mv B08_allLanes_P.g.norm.vcf.gz.tbi B08_allLanes_P.g.vcf.gz.tbi
+mv C08_allLanes_P.g.norm.vcf.gz.tbi C08_allLanes_P.g.vcf.gz.tbi
+mv D08_allLanes_P.g.norm.vcf.gz.tbi D08_allLanes_P.g.vcf.gz.tbi
+mv E08_allLanes_P.g.norm.vcf.gz.tbi E08_allLanes_P.g.vcf.gz.tbi
+mv F08_allLanes_P.g.norm.vcf.gz.tbi F08_allLanes_P.g.vcf.gz.tbi
+mv G08_allLanes_P.g.norm.vcf.gz.tbi G08_allLanes_P.g.vcf.gz.tbi
+mv H08_allLanes_P.g.norm.vcf.gz.tbi H08_allLanes_P.g.vcf.gz.tbi
+mv A09_allLanes_P.g.norm.vcf.gz.tbi A09_allLanes_P.g.vcf.gz.tbi
+mv B09_allLanes_P.g.norm.vcf.gz.tbi B09_allLanes_P.g.vcf.gz.tbi
+mv C09_allLanes_P.g.norm.vcf.gz.tbi C09_allLanes_P.g.vcf.gz.tbi
+mv D09_allLanes_P.g.norm.vcf.gz.tbi D09_allLanes_P.g.vcf.gz.tbi
+mv E09_allLanes_P.g.norm.vcf.gz.tbi E09_allLanes_P.g.vcf.gz.tbi
+mv F09_allLanes_P.g.norm.vcf.gz.tbi F09_allLanes_P.g.vcf.gz.tbi
+mv G09_allLanes_P.g.norm.vcf.gz.tbi G09_allLanes_P.g.vcf.gz.tbi
+mv H09_allLanes_P.g.norm.vcf.gz.tbi H09_allLanes_P.g.vcf.gz.tbi
+mv A10_allLanes_P.g.norm.vcf.gz.tbi A10_allLanes_P.g.vcf.gz.tbi
+mv B10_allLanes_P.g.norm.vcf.gz.tbi B10_allLanes_P.g.vcf.gz.tbi
+mv C10_allLanes_P.g.norm.vcf.gz.tbi C10_allLanes_P.g.vcf.gz.tbi
+```
+
+Oops, now when I rerun snakemake, I got an error that they can't open files A01_allLanes_P.g.vcf.gz, A02_allLanes_P.g.vcf.gz, A03_allLanes_P.g.vcf.gz, and A04_allLanes_P.g.vcf.gz because I had started to gunzip them to figure out what was wrong, but then I gzip them back but they should have been bgzipped. Check the type of file by running: `file C07_allLanes_P.g.vcf.gz`. Fix it by:
+```{bash eval=FALSE}
+gunzip A01_allLanes_P.g.vcf.gz
+gunzip A02_allLanes_P.g.vcf.gz
+gunzip A03_allLanes_P.g.vcf.gz
+gunzip A04_allLanes_P.g.vcf.gz
+
+bgzip -@ 8 A01_allLanes_P.g.vcf
+bgzip -@ 8 A02_allLanes_P.g.vcf
+bgzip -@ 8 A03_allLanes_P.g.vcf
+bgzip -@ 8 A04_allLanes_P.g.vcf
+
+module load conda/base/latest
+module load gatk/4.2.6.1
+module load jdk/17.0.1
+
+gatk IndexFeatureFile -I A01_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A02_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A03_allLanes_P.g.vcf.gz
+gatk IndexFeatureFile -I A04_allLanes_P.g.vcf.gz
+```
+
+
+
+After rerunning snakemake again I am running into the following errors in the error-63776931.4294967294_snakemake.txt
+```{bash eval=FALSE}
+Error in rule DB2vcf:
+    jobid: 4262
+    input: results/GCF_021917145.1_fHypTra1_genomic/genomics_db_import/DB_L0698.tar, results/GCF_021917145.1_fHypTra1_genomic/data/genome/GCF_021917145.1_fHypTra1_genomic.fna
+    output: results/GCF_021917145.1_fHypTra1_genomic/vcfs/intervals/L0698.vcf.gz, results/GCF_021917145.1_fHypTra1_genomic/vcfs/intervals/L0698.vcf.gz.tbi
+    log: logs/GCF_021917145.1_fHypTra1_genomic/gatk_genotype_gvcfs/0698.txt (check log file(s) for error details)
+    conda-env: /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/.snakemake/conda/e52589dbb00a87caddfdc88142f0690e_
+    shell:
+
+        tar -xf results/GCF_021917145.1_fHypTra1_genomic/genomics_db_import/DB_L0698.tar
+        gatk GenotypeGVCFs             --java-options '-Xmx29000m -Xms29000m'             -R results/GCF_021917145.1_fHypTra1_genomic/data/genome/GCF_021917145.1_fHypTra1_genomic.fna             --heterozygosity 0.005             --genomicsdb-shared-posixfs-optimizations true             -V gendb://results/GCF_021917145.1_fHypTra1_genomic/genomics_db_import/DB_L0698             -O results/GCF_021917145.1_fHypTra1_genomic/vcfs/intervals/L0698.vcf.gz             --tmp-dir <TBD> &> logs/GCF_021917145.1_fHypTra1_genomic/gatk_genotype_gvcfs/0698.txt
+
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+    cluster_jobid: 63777165
+```
+
+Looking at logs/GCF_021917145.1_fHypTra1_genomic/gatk_genotype_gvcfs/0698.txt tells me the error:
+`GenomicsDB JNI Error: VariantQueryProcessorException : Unhandled overlapping variants at columns 424501889 and 424501890 for row 56`
+
+Also getting a similar error in file 0706.txt, 0298.txt. and 0048.txt
+This is the only help I can find: https://gatk.broadinstitute.org/hc/en-us/community/posts/10749900348571-GenotypeGVCFs-VariantQueryProcessorException
+
+Got a reply from this forum: https://gatk.broadinstitute.org/hc/en-us/community/posts/10749900348571-GenotypeGVCFs-VariantQueryProcessorException?page=1#community_comment_15293617323547
+Also copy and pasted here:
+Hi Joanna Griffiths
+
+I've worked with GenomicsDB a lot, but I've never seen this error message before.  I have one suggestion you can try before we pass this issue on to the GenomicsDB development team.  The GATK tool ReblockGVCF is very particular about gaps and overlaps in GVCFs and will correct overlapping reference blocks and reference blocks overlapping variants.  Since you only have the one sample, you can process it in maybe an hour with that tool and hopefully it will fix the issue.  The main purpose of the tool is to compress reference blocks by combining similar quality scores.  This will only affect hom-ref genotypes, so in your single-sample case it may not make a difference at all.  The default parameters will lead to significant decrease in file size by using a low quality [0,20) GQ band and a high quality [20,99] GQ band.  (See the GVCF doc on the forum if this is unfamiliar.) There's an example command here https://github.com/broadinstitute/warp/blob/e3d65dba8f9e3682fc709d9bc29dfe077981e75c/tasks/broad/GermlineVariantDiscovery.wdl#L217  That's our internal best practices for compression, but if you want to replicate the HaplotypeCaller reference blocks exactly you can copy the gvcf-gq-bands arguments from the HaplotypeCaller command header at the top of the GVCF.
+
+I hope that helps!
+
+Laura
+
+
+## Reference Panel Generation
+
+First let's remove the empty wells from the vcf file and samples that had less than a sequencing depth of 2. Some parents had less starting DNA than others so let's remove the poorly sequenced ones.
+
+Empty wells: 
+* C12_allLanes_P
+* D12_allLanes_P
+* E12_allLanes_P
+* F12_allLanes_P
+* G12_allLanes_P
+* H12_allLanes_P
+
+Poorly sequenced | DP:
+* A10_allLanes_P  0.00352455
+* F11_allLanes_P  0.0122306
+* H10_allLanes_P  0.0310676
+* G11_allLanes_P 0.16
+
+These are all in the file called `empty_well_names`. Use this command to remove them (see script `gatk_filter.sh`)
+```{bash eval=FALSE}
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/results/GCF_021917145.1_fHypTra1_genomic
+
+##quick data check on mean depth
+module load deprecated/bio/1.0
+vcftools --vcf Smelt_Parents_raw.vcf --depth --out Smelt_Parents_raw
+
+## remove empty wells
+vcftools --vcf Smelt_Parents_raw.vcf --remove empty_well_names --recode --recode-INFO-all --out Smelt_Parents_fil
+```
+
+
+Now let's do some filtering of our raw vcf file using gatk VariantFiltration and bcftools.
+The gatk VariantFiltration tool produces a filtered VCF in which passing variants are annotated as PASS and failing variants are annotated with the name(s) of the filter(s) they failed.
+
+```{bash eval=FALSE}
+
+module load gatk/4.2.6.1
+module load jdk/17.0.1
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/results/GCF_021917145.1_fHypTra1_genomic
+
+ gatk VariantFiltration \
+   -R data/genome/GCF_021917145.1_fHypTra1_genomic.fna \
+   -V Smelt_Parents_fil.recode.vcf \
+   -O Smelt_Parents_fil2.vcf \
+   --filter-expression "QD < 2.0 || FS > 60 || MQ < 40 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || SOR > 3.0 || DP < 2 || DP > 100 || GQ < 20" \
+   --filter-name "haplo_filters"
+```
+
+MQRankSum: mapping qualities of the reads supporting the reference allele with those supporting the alternate allele. The ideal result is a value close to zero, which indicates there is little to no difference. A negative value indicates that the reads supporting the alternate allele have lower mapping quality scores than those supporting the reference allele. Conversely, a positive value indicates that the reads supporting the alternate allele have higher mapping quality scores than those supporting the reference allele. Usually only highly negative values are removed, because highly positive are uninformative.
+https://gatk.broadinstitute.org/hc/en-us/articles/360045799632-MappingQualityRankSumTest
+
+ReadPosRankSum: This variant-level annotation tests whether there is evidence of bias in the position of alleles within the reads that support them, between the reference and alternate alleles. Seeing an allele only near the ends of reads is indicative of error, because that is where sequencers tend to make the most errors. he ideal result is a value close to zero, which indicates there is little to no difference in where the alleles are found relative to the ends of reads. A negative value indicates that the alternate allele is found at the ends of reads more often than the reference allele. 
+https://gatk.broadinstitute.org/hc/en-us/articles/360036367052-ReadPosRankSumTest
+
+GC: Genotype Quality, related to phred score:https://gatk.broadinstitute.org/hc/en-us/articles/360035890451-Calculation-of-PL-and-GQ-by-HaplotypeCaller-and-GenotypeGVCFs
+
+QD: Quality by depth. This annotation puts the variant confidence QUAL score into perspective by normalizing for the amount of coverage available. Because each read contributes a little to the QUAL score, variants in regions with deep coverage can have artificially inflated QUAL scores, giving the impression that the call is supported by more evidence than it really is. To compensate for this, we normalize the variant confidence by depth, which gives us a more objective picture of how well supported the call is.
+https://gatk.broadinstitute.org/hc/en-us/articles/360037592191-QualByDepth
+
+**Note I stopped trying to work on this after I realized these filters had already been applied, after looking at the top of the VCF. I just have to run the code below to select all markers that have "passed" these filters. Also select for bi-alleic markers in this code
+```{bash eval=FALSE}
+
+bcftools view -v snps -m2 -M2 -f .,PASS -e 'AF==1 | AF==0 | AF<0.01 | ALT="*" | TYPE~"indel" | ref="N"' Smelt_Parents_raw.vcf -o Smelt_Parents_fil2.vcf
+```
+
+How many SNPs started with (from the Smelt_parents_raw.idepth file):
+7,426,120
+
+Remaining SNPs
+` mawk '!/#/' Smelt_Parents_fil2.vcf | wc -l`
+2,468,195
+
+Create individual vcfs and filter by depth while doing so:
+```{bash eval=FALSE}
+
+module load deprecated/bio/1.0
+module load parallel/20220522
+
+
+vcftools --vcf Smelt_Parents_fil2.vcf --keep parent_name_files --minDP 2 --maxDP 100 --recode --recode-INFO-all --out Smelt_Parents_fil3
+
+module load bcftools/1.14
+bcftools convert Smelt_Parents_fil3.recode.vcf -O b -o Smelt_Parents_fil3.recode.bcf
+bcftools index Smelt_Parents_fil3.recode.bcf
+
+```
+
+### Extra Quality Control test
+
+We are going to only keep variants that have been successfully genotyped in 10% of individuals
+https://samtools.github.io/bcftools/howtos/filtering.html
+https://samtools.github.io/bcftools/howtos/plugin.fill-tags.html
+```{bash eval=FALSE}
+module load deprecated/bio/1.0
+vcftools --vcf Smelt_Parents_fil3.recode.vcf --max-missing 0.1 --recode --recode-INFO-all --out Smelt_Parents_fil4
+#After filtering, kept 2,460,159 out of a possible 2,468,195 Sites
+
+#ended up sticking with this cutoff:
+vcftools --vcf Smelt_Parents_fil3.recode.vcf --max-missing 0.5 --recode --recode-INFO-all --out Smelt_Parents_fil4
+#After filtering, kept 2,414,259 out of a possible 2,468,195 Sites
+
+
+#module load bcftools/1.14
+#bcftools convert Smelt_Parents_fil4.recode.vcf -O b -o Smelt_Parents_fil4.recode.bcf
+#bcftools index Smelt_Parents_fil4.recode.bcf
+#bcftools +fill-tags Smelt_Parents_fil4.recode.bcf -Ou -- -t all | bcftools view -e'HWE<=0.05' > Smelt_Parents_fil4.hwe.bcf
+
+#-e stands for exclude
+curl -L -O https://github.com/jpuritz/dDocent/raw/master/scripts/filter_hwe_by_pop.pl
+chmod +x filter_hwe_by_pop.pl
+
+moduel load perl/5.26.1
+module load deprecated/bio/1.0
+perl filter_hwe_by_pop.pl -v Smelt_Parents_fil4.recode.vcf -p popmap.txt -o Smelt_Parents_fil4.HWE
+#Outputting results of HWE test for filtered loci to 'filtered.hwe'
+#Kept 2339544 of a possible 2414259 loci (filtered 74715 loci)
+
+#This didn't remove anything so I'm not going to run it/keep the output file.
+#vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --minQ 30 --recode --recode-INFO-all --out Smelt_Parents_fil5.HWE
+
+##didn't run filters below either because they didn't remove any SNPs (minDP) and maxmissing 0.75 decreased concordance accuary.
+#vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --minDP 3 --recode --recode-INFO-all --out Smelt_Parents_fil5.HWE 
+#After filtering, kept 2337994 out of a possible 2337994 Sites
+
+#vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --minDP 4 --recode --recode-INFO-all --out Smelt_Parents_fil5.HWE 
+#After filtering, kept 2337994 out of a possible 2337994 Sites
+
+#vcftools --vcf Smelt_Parents_fil3.recode.vcf --max-missing 0.75 --recode --recode-INFO-all --out Smelt_Parents_fil4
+#After filtering, kept 2,285,731 out of a possible 2,337,994 Sites
+
+##Remove alleles less than a minor allele freq of 2% for main pipeline--not validation pipeline.
+vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --maf 0.018 -recode --recode-INFO-all --out Smelt_Parents_fil5.HWE
+#Parameters as interpreted:
+#        --vcf Smelt_Parents_fil4.HWE.recode.vcf
+#        --recode-INFO-all
+#        --maf 0.018
+#        --out Smelt_Parents_fil5.HWE
+#        --recode
+
+#After filtering, kept 86 out of 86 Individuals
+#Outputting VCF file...
+#After filtering, kept 1301267 out of a possible 2339544 Sites
+```
+
+### Linkage Disequilibrium of reference panel
+Let's take a look at LD in parents file. This will help test the quality of the phased reference panel.
+Helpful link: https://www.york.ac.uk/res/dasmahapatra/teaching/MBiol_sequence_analysis/workshop4_2019.html#nucleotide_diversity
+
+run the script `plink_LD.sh`
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#qSBATCH --job-name=LD
+#SBATCH --mem=4G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_LD.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_LD.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/
+
+module load deprecated/plink/1.90
+Smelt_Parents_fil3.recode.vcf
+plink --vcf Smelt_Parents_fil3.recode.vcf --allow-extra-chr --double-id --out Smelt_Parents_fil3.plink
+plink --bfile Smelt_Parents_fil3.plink --allow-extra-chr --recode --tab --out Smelt_Parents_fil3.plink
+plink --file Smelt_Parents_fil3.plink --allow-extra-chr --r2 --out Smelt_Parents_fil3.plink --threads 8
+
+date
+exit
+```
+
+Move the output file `Smelt_Parents_fil3.plink.ld` to the local desktop and run the Rscript to generate a figure of LD decay
+```{r eval=FALSE}
+setwd("~/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Parent_vcf")
+
+ld <- read.table("Smelt_Parents_fil3.plink.ld", header=T)
+ld$distance <- ld$BP_B-ld$BP_A
+
+windows()
+plot(ld$distance, ld$R2, col = "white", xlim = c(0,1000), xlab = "distance (bp)" ,ylab = "R2")
+smooth_ld <-smooth.spline(ld$distance, ld$R2, spar = .15)
+lines(smooth_ld, lwd = 2, col = "red")
+
+```
+
+### Nucleotide Diversity of reference panel
+Let's look at the amount of nucleotide diversity present in the parent samples. This will also help inform the imputation accuracy.
+run script `calc-pi.sh`
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#qSBATCH --job-name=pi
+#SBATCH --mem=4G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_pi.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_pi.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/
+
+module load deprecated/bio/1.0
+vcftools --vcf Smelt_Parents_fil3.recode.vcf --site-pi --out Smelt_Parents_fil3.pi
+vcftools --vcf Smelt_Parents_fil3.recode.vcf --window-pi 1000 --window-pi-step 1000 --out Smelt_Parents_fil3.pi
+
+
+date
+exit
+```
+
+Now bring the files over to the local desktop to create density figures and histograms.
+```{r eval=FALSE}
+setwd("~/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Parent_vcf")
+
+pi_site <- read.table("Smelt_Parents_fil3.pi.sites.pi", header=TRUE)
+windows()
+hist(pi_site$PI)
+boxplot(pi_site$PI)
+
+pi_window <- read.table("Smelt_Parents_fil3.pi.windowed.pi", header=TRUE)
+windows()
+hist(pi_window$PI)
+boxplot(pi_window$PI)
+```
+
+###Phase reference panel
+#### Whatshap
+https://github.com/whatshap/whatshap
+https://whatshap.readthedocs.io/en/latest/guide.html
+
+Whatshap will use heterozygous sites to phase genotypes and adds a filter to the SNP site. See file `whatshap.sh` below
+```{bash eval=FALSE}
+
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=whatsHap
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_whatsHap.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_whatsHap.txt
+#SBATCH --time=3-00:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/
+module load deprecated/bio/1.0
+module load deprecated/parallel/20220522
+cat parent_name_files | parallel -j 10 "vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --indv {} --recode --recode-INFO-all --out /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/Whatshap/{}_fil
+
+
+module load deprecated/whatshap/1.4
+source activate whatshap-1.4
+
+module load parallel/20220522
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main/results/GCF_021917145.1_fHypTra1_genomic/
+
+cat parent_name_files | parallel -j 8 "whatshap phase -o /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/Whatshap/{}_phased.vcf --reference=data/genome/GCF_021917145.1_fHypTra1_genomic.fna /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/whatshap/{}_fil.recode.vcf bams/{}_final.bam"
+
+conda deactivate
+```
+I moved all the phased files into the directory: /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing
+
+Now let's merge all the individual vcfs back together using bcftools. This is in the bottom of the `whatshap.sh` script
+```{bash eval=FALSE}
+
+module load bcftools/1.13
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing
+
+for filename in *phased.vcf
+       do
+       bgzip -@ 8 $filename
+       done
+
+for filename in *phased.vcf.gz
+        do
+        gatk IndexFeatureFile -I $filename
+        done
+        
+bcftools merge *phased.vcf -o Smelt_Parents_phased.vcf
+```
+
+#### Shapeit4
+https://odelaneau.github.io/shapeit4/
+
+Start with installing Shapeit4 on my home directory of FARM
+```{bash eval=FALSE}
+module load conda/base/latest
+
+conda create --name shapeit_env
+conda activate shapeit_env
+conda deactivate
+
+conda install -c bioconda shapeit4
+```
+
+Run the software: `shapeit4.sh`
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=SHAPEIT
+#SBATCH --mem=60G
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_SHAPEIT.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_SHAPEIT.txt
+#SBATCH --time=1-00:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing
+
+##convert to bcf and index
+module load bcftools/1.13
+bcftools convert Whatshap/Smelt_Parents_phased.vcf -O b -o Whatshap/Smelt_Parents_phased.bcf
+bcftools index Whatshap/Smelt_Parents_phased.bcf
+
+
+module load conda/base/latest
+source activate shapeit_env
+
+##test on one chromosome
+#shapeit4 --input Whatshap/Smelt_Parents_phased.bcf --thread 8 --output shapeit4/Smelt_Parents_shapeit4_NC_061060.1.vcf.gz --sequencing --use-PS 0.0001 --region NC_061060.1 --log NC_061060.1.log
+
+##now all chromosomes
+cat contig_names | parallel -j 8 "shapeit4 --input Whatshap/Smelt_Parents_phased.bcf --output shapeit4/Smelt_Parents_shapeit4_{}.vcf.gz --sequencing --use-PS 0.0001 --region {} --log shapeit4/{}.log"
+
+
+while IFS= read -r line; do
+  shapeit4 --input Whatshap/Smelt_Parents_phased.bcf --output shapeit4/Smelt_Parents_shapeit4_${line}.vcf.gz --sequencing --use-PS 0.0001 --region ${line} --log shapeit4/${line}.log
+done < contig_names
+
+conda deactivate
+
+```
+`--use-PS 0.0001` use phase sets fro WhatsHap results, defines the expected error rate in the phase sets. Phase sets are specified in the VCF/BCF file format using the PS field. Note that the PS needs to be defined in the VCF/BCF as a 32bits integer since we read them using the C function bcf_get_format_int32
+
+#### Shapeit5
+
+https://odelaneau.github.io/shapeit5/docs/tutorials/simulated/
+
+They recommend to chunk the chromosome into large chunks (e.g. 20 cM) if using large WGS data. 1 cM= 1,000,000 bp. The largest contig in my genome is 22 CM so I don't think I need to further chunk my genome. 
+
+First, make a file with a list of all the contig names
+`grep "##contig" Smelt_Parents_fil3.recode.vcf > contig_names`
+`sed 's|##contig=<ID=||g' contig_names > contig_names2`
+`awk -F"," '{print $1}' contig_names2 > contig_names3`
+`rm contig_names contig_names2`
+`mv contig_names3 contig_names`
+
+
+```{bash eval=FALSE}
+
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=SHAPEIT
+#SBATCH --mem=60G
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_SHAPEIT.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_SHAPEIT.txt
+#SBATCH --time=1-00:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+module load conda/base/latest
+module load conda/shapeit/
+module load parallel/20220522
+
+##convert vcf to bcf for SHAPEIT input
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/
+module load bcftools/1.14
+bcftools convert Smelt_Parents_fil4.HWE.recode.vcf -O b -o Smelt_Parents_fil4.HWE.recode.bcf
+bcftools index Smelt_Parents_fil4.HWE.recode.bcf
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/
+
+##test that the software is working with just one sample first:
+#SHAPEIT5_phase_common --input Smelt_Parents_fil4.HWE.recode.bcf --filter-maf 0.001 --region NC_061060.1 --output phase_common/target.scaffold.NC_061060.1.bcf --thread 8 --log phase_common/NC_061060.1.log
+
+##I kept getting errors for trying to run this as a job, but it works with the one contig above. I tried it as a while loop and kept getting illegal instruction errors. In the end I submitted it as a while loop on the command line,but took too long. Tried as a job the next day and it worked fine, so something funny was going on with FARM. Maybe also delete log files before rerunning and logging out of farm and back in? Maybe there's some module incompatibilities?
+#changed to high2 partition and now it seems to be running with 22 CPUs. It was trying with 24 CPUs on high parition, so maybe it's something with the CPUs? I also removed th#SBATCH -nthreads=8
+cat contig_names | parallel -j 8 "SHAPEIT5_phase_common --input Smelt_Parents_fil4.HWE.recode.bcf --filter-maf 0.001 --region {} --output phase_common/target.scaffold.{}.bcf --thread 8 --log phase_common/{}.log"
+
+
+##For some reason, when I try to run it like this below I get an error that says illegal argument
+
+while IFS= read -r line; do
+  echo "tester: $line"
+done < "$1"
+
+INTERVALS=$(cat contig_names)
+
+for contig in $INTERVALS
+do
+        SHAPEIT5_phase_common --input Smelt_Parents_fil4.HWE.recode.bcf --filter-maf 0.001 --region $contig --output phase_common/target.scaffold.$contig.bcf --thread 8 --log $contig.log
+done
+```
+
+These regions/contigs of the genome didn't have any variants to be phased:
+* NW_025813839.1
+* NW_025813920.1
+* NW_025813980.1
+* NW_025813982.1
+
+
+So I created a new contig name file with the above contigs removed called contig_names_phased, which was used in the next imputation step (bcftools and glimpse)
+
+
+
+
+## Create bam files for offspring using snpArcher snakemake pipeline
+First rename files by changing - to _
+`for file in *; do mv "$file" "${file/-/_}"; done` run this line twice.
+
+Next, lets set up the samples.csv file that is input to snakemake. I first created the file `sample_list`:
+`ls * > samples`
+`cut -c-11 samples |uniq > sample_list`
+
+
+```{bash eval=FALSE}
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-offspring/workflow/
+
+module load conda/base/latest
+
+python3 write_samples.py -s /group/awhitehegrp2/joanna/Smelt_WGS/Data/all_offspring/sample_list -f /group/awhitehegrp2/joanna/Smelt_WGS/Data/all_offspring -r /group/awhitehegrp2/joanna/Smelt_WGS/GCF_021917145.1_fHypTra1_genomic.fna
+
+```
+**Note: The sample_list file is a list of all the samples labeled as so: A01_Plate01
+**Note: The newest version of the write_samples.py now works since they had recently updated it.
+Finally, I had to go into the samples.csv file to manually add a comma between the refPath and Run for each line.
+
+
+Edit the slurm profile so it knows which partitions to use on FARM:
+'vim snpArcher-main/profiles/slurm/cluster_config.yml'
+```{bash eval=FALSE}
+__default__:
+    partition: "high"
+    time: 9000
+    nodes: 1
+    mem: 1000
+    output: "/group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%sm_log.txt"
+```
+
+Edit the config/resources.yaml file: Change the number of threads used for bwa mapping since our cluster doesn't allow 31 threads per node. Changed to 16
+
+
+Edit the config/config.yaml file:
+```{bash eval=FALSE}
+##############################
+# Variables you need to change
+##############################
+
+samples: "config/samples.csv" # path to the sample metadata CSV
+resource_config: "config/resources.yaml" # path to resources yaml config
+final_prefix: "Smelt_Offspring" # prefix for final output files
+intervals: True #Set to True if you want to perform variant calling using interval approach.
+sentieon: False #set to True if you want to use sentieon, False if you want GATK
+sentieon_lic: "" #set to path of sentieon license
+remote_reads: False # Set True if reads are in a Google Bucket seperate from --default-remote-prefix.
+remote_reads_prefix: "" # set to google bucket prefix where reads live
+bigtmp: "/group/awhitehegrp2/joanna/temp" #Set to a path with lots of free space to use for commands that require large amounts of temp space; defaults to system tmpdir if empty
+cov_filter: True #set to True if you want to include coverage thresholds in the callable sites bed file (default uses mappability only)
+
+```
+**Note: I also change the num_gvcf_intervals: to 200 instead of the default which was 50. Too few intervals caused a series of annoying errors below and I basically ended up rerunning everything.
+
+NOW we can run snakemake with script snakemake.sh:
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=sm
+#SBATCH --mem=3G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_snakemake.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_snakemake.txt
+#SBATCH --time=168:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load conda3/1.0
+source activate snakemake
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher
+snakemake --snakefile workflow/Snakefile --profile ./profiles/slurm --conda-frontend conda
+
+conda deactivate
+```
+
+
+Let's check the mean sequencing depth of the offspring with script `offspring_cov.sh`
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=glimpse_validate
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_glimpse_validate.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_glimpse_validate.txt
+#SBATCH --time=124:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+## Downsample individual H02 from 30x to 1x
+module load samtools/1.14
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams
+
+while IFS= read -r line; do
+        samtools coverage ${line}_final.bam > coverage/${line}.cov
+done < offspring_list_no_empties
+
+while IFS= read -r line; do
+        awk '{ total += $7; count++ } END { print total/count }' coverage/${line}.cov >> coverage/all_off_mean_cov
+done < offspring_list_no_empties
+
+date
+exit
+
+```
+
+```{r eval=FALSE}
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Imputation")
+
+cov <- read.table("all_off_mean_cov", header = F)
+windows()
+hist(cov$V1)
+mean(cov$V1) 
+#2.891843
+
+```
+
+
+
+
+## Imputation
+### GLIMPSE software
+
+GLIMPSE1 tutorial: https://odelaneau.github.io/GLIMPSE/glimpse1/tutorial_b38.html#run_likelihoods
+
+Now let's run the imputation pipeline. First we will extract sites from the reference panel using bcftools. See glimpse1.sh 
+```{bash eval=FALSE}
+
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=glimpse
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_glimpse.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_glimpse.txt
+#SBATCH --time=9-00:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load bcftools/1.14
+module load parallel/20220522
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/
+
+##extract sites from the reference panel
+##test on one sample first
+#bcftools view -G -Oz -o reference_panel/NC_061060.1.sites.vcf.gz phase_common/target.scaffold.NC_061060.1.bcf
+
+#now on all samples in parallel
+cat contig_names | parallel -j 8 "bcftools view -G -Oz -o reference_panel/{}.sites.vcf.gz phase_common/target.scaffold.{}.bcf"
+cat contig_names | parallel -j 8 "bcftools index -f reference_panel/{}.sites.vcf.gz"
+#below two lines are for GLIMPSE1 only
+cat contig_names_phased | parallel -j 8 "bcftools query -f'%CHROM\t%POS\t%REF,%ALT\n' reference_panel/{}.sites.vcf.gz | bgzip -c > reference_panel/{}.sites.tsv.gz"
+cat contig_names_phased | parallel -j 8 "tabix -s1 -b2 -e2 reference_panel/{}.sites.tsv.gz"
+
+
+## Compute genotype likelihoods for a single individual at specific positions (GLIMPSE1 only)
+## The output of this step is a VCF file format containing genotype likelihoods at each site in the reference panel.
+#test with one sample and one chromosome first
+module load bcftools/1.14
+cd /group/awhitehegrp2/joanna/Smelt_WGS
+BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam
+VCF=Analysis/phasing/reference_panel/NC_061060.1.sites.vcf.gz
+TSV=Analysis/phasing/reference_panel/NC_061060.1.sites.tsv.gz
+REFGEN=GCF_021917145.1_fHypTra1_genomic.fna
+OUT=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/A02_plate01_NC_061060.1.vcf.gz
+bcftools mpileup -f${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r NC_061060.1 ${BAM} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT}
+bcftools index -f ${OUT}
+
+#Loop version:
+cd /group/awhitehegrp2/joanna/Smelt_WGS
+module load bcftools/1.14
+while IFS= read -r line; do
+       echo $line
+       Analysis/bcftools_GL.sh $line
+done < Analysis/phasing/contig_names_phased
+
+#contents of bcftools_GL.sh for testing one sample and all chromosomes:
+BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam
+VCF=Analysis/phasing/reference_panel/${1}.sites.vcf.gz
+TSV=Analysis/phasing/reference_panel/${1}.sites.tsv.gz
+REFGEN=GCF_021917145.1_fHypTra1_genomic.fna
+OUT=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/A02_plate01_${1}.vcf.gz
+
+bcftools mpileup -f${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r NC_061060.1 ${BAM} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT}
+bcftools index -f ${OUT}
+
+#contents of bcftools_GL.sh for testing all samples and all chromosomes:
+BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam
+VCF=Analysis/phasing/reference_panel/${1}.sites.vcf.gz
+TSV=Analysis/phasing/reference_panel/${1}.sites.tsv.gz
+REFGEN=GCF_021917145.1_fHypTra1_genomic.fna
+
+
+while IFS= read -r line; do
+  BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/${line}_final.bam
+  OUT=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/${line}_${1}.vcf.gz
+  #echo BAM
+  #echo OUT
+  bcftools mpileup -f${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r NC_061060.1 ${BAM} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT}
+  bcftools index -f ${OUT}
+done < /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/offspring_sample_list
+
+
+##didn't quite finish in the alloted time, so I reran for unfinished contigs. See below for how I figured out which contigs hadn't finished. I had to do this as a loop because so many files were created, it was so slow to run on the command line.
+module load bcftools/1.14
+cd /group/awhitehegrp2/joanna/Smelt_WGS
+while IFS= read -r line; do
+       echo $line
+       Analysis/bcftools_GL.sh $line
+done < Analysis/phasing/contig_names_phased_unfinished_vcfs
+
+##this was the code I used to figure out which contigs have not yet finished:
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/
+while IFS= read -r line; do
+       ls *${line}.vcf.gz | wc -l >> vcf_completed
+done < /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/contig_names_phased
+
+
+
+## Merging genotype likelihoods of multiple individuals. The list file contains all individuals that need to be merged for each chromosome.
+##Create list of sample files per contig, could only get this to work on command line, not as a job
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/
+while IFS= read -r line; do
+       ls *${line}.vcf.gz > ${line}_vcfs
+done < /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/contig_names_phased
+
+##Merge GLs
+module load bcftools/1.14
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs
+
+#test with one chromosome first
+ls *NC_061060.1.vcf.gz > NC_061060.1.offspring_list
+bcftools merge -m none -r NC_061060.1 -Oz -o merged/merged.NC_061060.1.vcf.gz -l NC_061060.1.offspring_list
+bcftools index -f merged/merged.NC_061060.1.vcf.gz
+
+##now loop through all chromosomes
+while IFS= read -r line; do
+  bcftools merge -m none -r $line -Oz -o merged/merged.${line}.vcf.gz -l ${line}_vcfs
+  bcftools index -f merged/merged.${line}.vcf.gz
+done < /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/contig_names_phased
+
+## split genome into chunks. This can be run the same time as above when creating the GLs, because the GLs don't depend on this and it takes a realy long time to make the GLs
+## test with one sample first
+module load glimpse/1.1.1
+module load parallel/20220522
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/reference_panel
+
+GLIMPSE_chunk --input NC_061060.1.sites.vcf.gz --region NC_061060.1 --window-size 2000000 --buffer-size 200000 --output chunks/chunks.NC_061060.1.txt --log NC_061060.1.log
+
+# now with all chromosomes
+cat ../contig_names | parallel -j 8 "GLIMPSE_chunk --input {}.sites.vcf.gz --region {} --window-size 2000000 --buffer-size 200000 --output chunks/chunks.{}.txt --log chunks/{}.log"
+
+
+
+##Impute and phase a whole chromosome
+##This part takes a long time so I need to parallelize it. I split the contig_names_phased file into multiple files with 10 contigs per file and submitted each split file as a separate job
+
+
+
+
+This is the content of the glimpse1_impute.sh file:
+##testing on one contig:
+VCF=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/merged.NC_061060.1.vcf.gz
+REF=Analysis/phasing/phase_common/target.scaffold.NC_061060.1.bcf
+
+while IFS= read -r LINE; do
+  printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+   IRG=$(echo $LINE | cut -d" " -f3)
+   ORG=$(echo $LINE | cut -d" " -f4)
+   OUT=Analysis/GLIMPSE_imputed/NC_061060.1.${ID}.bcf
+   GLIMPSE_phase --input ${VCF} --reference ${REF} --input-region ${IRG} --output-region ${ORG} --output ${OUT}
+   bcftools index -f ${OUT}
+done < Analysis/phasing/reference_panel/chunks/chunks.NC_061060.1.txt
+
+
+#Now on all contigs
+VCF=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/merged.${1}.vcf.gz
+REF=Analysis/phasing/phase_common/target.scaffold.${1}.bcf
+
+while IFS= read -r LINE; do
+  printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+   IRG=$(echo $LINE | cut -d" " -f3)
+   ORG=$(echo $LINE | cut -d" " -f4)
+   OUT=Analysis/GLIMPSE_imputed/${1}.${ID}.bcf
+   GLIMPSE_phase --main 15 --input ${VCF} --reference ${REF} --input-region ${IRG} --output-region ${ORG} --output ${OUT}
+   bcftools index -f ${OUT}
+done < Analysis/phasing/reference_panel/chunks/chunks.${1}.txt
+```
+
+samtools 1.03 -> mean depth = 2.01385
+samtools 1.04 -> mean depth = 2.68549
+samtools 1.05 -> mean depth = 3.35761
+samtools 1.06 -> mean depth = 4.03232
+samtools 1.07 -> mean depth = 4.70138
+
+To run `sbatch -J GI.${USER} --array=1-372 glimpse_impute.sh`
+```{bash eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=glimpse_impute
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_glimpse_impute.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_glimpse_impute.txt
+#SBATCH --time=120:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p med
+
+module load bcftools/1.14
+module load glimpse/1.1.1
+
+start=`date +%s`
+
+name=`head -n ${SLURM_ARRAY_TASK_ID} contig_names_phased | tail -1`
+
+export baseP=/group/awhitehegrp2/joanna/Smelt_WGS
+
+VCF=${baseP}/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/merged.${name}.vcf.gz
+REF=${baseP}/Analysis/phasing/phase_common/target.scaffold.${name}.bcf
+
+cd ${baseP}
+
+while IFS= read -r LINE; do
+  printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+   IRG=$(echo $LINE | cut -d" " -f3)
+   ORG=$(echo $LINE | cut -d" " -f4)
+   OUT=Analysis/GLIMPSE_imputed/${name}.${ID}.bcf
+   GLIMPSE_phase --main 15 --input ${VCF} --reference ${REF} --input-region ${IRG} --output-region ${ORG} --output ${OUT}
+   bcftools index -f ${OUT}
+done < Analysis/phasing/reference_panel/chunks/chunks.${name}.txt
+
+end=`date +%s`
+runtime=$((end - start ))
+echo $runtime
+```
+
+
+### Validate Imputation Code
+To test the accuracy of the imputation pipeline, we can downsample one of our parents from 30x to 1x and impute using the reference panel.
+
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=glimpse_validate
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_glimpse_validate.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_glimpse_validate.txt
+#SBATCH --time=124:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+## Downsample individual H02 from 30x to 1x
+module load samtools/1.14
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/bams
+samtools view -s 1.03 H02_allLanes_P_final.bam -bo /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate/H02_1x.bam
+samtools index /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate/H02_1x.bam
+samtools index /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate/H02_30x.bam
+
+##check that the coverage is ~1x,can run this on the command line
+samtools coverage /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate/H02_1x.bam
+
+
+##create vcf file with H02 sample
+module load deprecated/bio/1.0
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+vcftools --vcf Smelt_Parents_fil3.recode.vcf --recode --recode-INFO-all --out Smelt_Parents_fil3_noH02 --remove-indv H02_alllanes_P
+
+#create bcf from vcf
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+module load bcftools/1.14
+bcftools convert Smelt_Parents_fil3_noH02.recode.vcf -O b -o Smelt_Parents_fil3_noH02.recode.bcf
+bcftools index Smelt_Parents_fil3_noH02.recode.bcf
+
+##Create reference panel with SHAPEIT without H02
+module load conda/base/latest
+module load conda/shapeit/
+module load parallel/20220522
+
+##test that the software is working with just one sample first:
+#SHAPEIT5_phase_common --input Smelt_Parents_fil3_noH02.recode.bcf --filter-maf 0.001 --region NC_061060.1 --output phase_common/target.scaffold.NC_061060.1.bcf --thread 8 --log NC_061060.1.log
+
+##I kept getting errors for trying to run this as a job, but it works with the one contig above. I tried it as a while loop and kept getting illegal instruction errors. In the end I submitted it as a while loop on the command line,but took too long. Tried as a job the next day and it worked fine, so something funny was going on with FARM. Maybe also delete log files before rerunning and logging out of farm and back in? I think its soething to do with requiring so many threads and CPUs and memory. I got the one contig to work by increasing the memory to 60G. 
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+cat contig_names | parallel -j 8 "SHAPEIT5_phase_common --input Smelt_Parents_fil3_noH02.recode.bcf --filter-maf 0.001 --region {} --output phase_common/target.scaffold.{}.bcf --thread 8 --log phase_common/{}.log"
+
+while IFS= read -r LINE; do
+        SHAPEIT5_phase_common --input Smelt_Parents_fil3_noH02.recode.bcf --filter-maf 0.001 --region $LINE --output phase_common/target.scaffold.${LINE}.bcf --thread 8 --log phase_common/${LINE}.log
+done < contig_names
+
+
+## Compute genotype likelihoods for a single individual at specific positions (GLIMPSE1 only)
+## The output of this step is a VCF file format containing genotype likelihoods at each site in the reference panel. Note that I'm using the extracted sites vcf files from the main pipeline, because I want to make sure that H02 is genotyped at all potential sites.
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS
+module load bcftools/1.14
+while IFS= read -r line; do
+       echo $line
+       Analysis/bcftools_GL_validate.sh $line
+done < Analysis/phasing/contig_names_phased
+
+#contents of bcftools_GL.sh for one sample and all chromosomes:
+BAM=Analysis/phasing/glimpse_validate/H02_1x.bam
+VCF=Analysis/phasing/reference_panel/${1}.sites.vcf.gz
+TSV=Analysis/phasing/reference_panel/${1}.sites.tsv.gz
+REFGEN=GCF_021917145.1_fHypTra1_genomic.fna
+OUT=Analysis/phasing/glimpse_validate/GL_vcfs/H02_1x_${1}.vcf.gz
+
+bcftools mpileup -f${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r {1} ${BAM} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT}
+bcftools index -f ${OUT}
+
+BAM=Analysis/phasing/glimpse_validate/H02_30x.bam
+VCF=Analysis/phasing/reference_panel/${1}.sites.vcf.gz
+TSV=Analysis/phasing/reference_panel/${1}.sites.tsv.gz
+REFGEN=GCF_021917145.1_fHypTra1_genomic.fna
+OUT=Analysis/phasing/glimpse_validate/GL_vcfs/H02_30x_${1}.vcf.gz
+
+bcftools mpileup -f${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r {1} ${BAM} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT}
+bcftools index -f ${OUT}
+
+##Now we can impute the test sample. Make sure the code for the H02 sample is unhashtagged in the glimpse1_impute.sh script. Only difference is the file paths
+module load bcftools/1.14
+module load glimpse/1.1.1
+cd /group/awhitehegrp2/joanna/Smelt_WGS
+
+while IFS= read -r line; do
+       echo $line
+       Analysis/glimpse1_impute.sh $line
+done < Analysis/phasing/contig_names_phased
+
+#content of glimpse1_impute.sh for H02 pipeline. I first tried this with the default ne (unknown, I just didn't specify the flag. Then I tried for values of 20,200,2000,20000)
+VCF=Analysis/phasing/glimpse_validate/GL_vcfs/H02_1x_${1}.vcf.gz
+REF=Analysis/phasing/glimpse_validate/phase_common/target.scaffold.${1}.bcf
+
+while IFS= read -r LINE; do
+  printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+   IRG=$(echo $LINE | cut -d" " -f3)
+   ORG=$(echo $LINE | cut -d" " -f4)
+   OUT=Analysis/phasing/glimpse_validate/imputed/Ne_20/H02_1x_${1}.${ID}.bcf
+   GLIMPSE_phase --main 15 --ne 20 --input ${VCF} --reference ${REF} --input-region ${IRG} --output-region ${ORG} --output ${OUT}
+   bcftools index -f ${OUT}
+   
+done < Analysis/phasing/reference_panel/chunks/chunks.${1}.txt
+
+
+##ligate contig chunks together
+##First test on one contig
+module load bcftools/1.14
+module load glimpse/1.1.1
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+
+LST=imputed/ligated/list.NC_061060.1.txt
+ls imputed/H02_1x_NC_061060.1.*.bcf > ${LST}
+OUT=imputed/ligated/H02_1x.NC_061060.1.00.bcf
+GLIMPSE_ligate --input ${LST} --output $OUT
+bcftools index -f ${OUT}
+
+##Now on all contigs in file chunked_contigs
+module load bcftools/1.14
+module load glimpse/1.1.1
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+
+while IFS= read -r LINE; do
+  LST=imputed/ligated/list.${LINE}.txt
+  ls imputed/H02_1x_${LINE}.*.bcf > ${LST}
+  OUT=imputed/ligated/H02_1x.${LINE}.00.bcf
+  GLIMPSE_ligate --input ${LST} --output $OUT
+  bcftools index -f ${OUT}
+done < chunked_contigs
+
+
+##Glimpse sample whole chromosome data
+module load bcftools/1.14
+module load glimpse/1.1.1
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+
+while IFS= read -r LINE; do
+  VCF=imputed/ligated/H02_1x.${LINE}.00.bcf
+  OUT=phased/H02_1x.${LINE}.phased.bcf
+  GLIMPSE_sample --input ${VCF} --solve --output ${OUT}
+  bcftools index -f ${OUT}
+done < chunked_contigs
+
+
+##Glimpse concordance
+module load glimpse/1.1.1
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+#test with small contig
+echo NW_025813721.1 phase_common/target.scaffold.NW_025813721.1.bcf GL_vcfs/H02_30x_NW_025813721.1.vcf.gz imputed/H02_1x_NW_025813721.1.00.bcf > concordance.NW_025813721.1.lst
+
+GLIMPSE_concordance --input concordance.NW_025813721.1.lst --minDP 4 --output concordance/NW_025813721.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##test different levels of Ne
+module load glimpse/1.1.1
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/glimpse_validate
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/Ne_20/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance_Ne20/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/Ne_200/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance_Ne200/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/Ne_2000/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance_Ne2000/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+
+
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/Ne_1000/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance_Ne1000/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+
+
+
+
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/Ne_20000/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance_Ne20000/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/ligated/H02_1.7x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##
+echo NC_061061.1 ../phase_common/target.scaffold.NC_061061.1.bcf GL_vcfs/H02_30x_NC_061061.1.vcf.gz imputed/ligated/H02_1x.NC_061061.1.00.bcf > concordance.NC_061061.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061061.1.lst --minDP 4 --output concordance/NC_061061.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz chrom_imputed/ligated/H02_1x.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af
+-tag AF_nfe --thread 4
+
+##
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf glimpse_validate/GL_vcfs/E08_plate13_NC_061060.1.vcf.gz glimpse_validate/imputed/ligated/E08_plate13_1.2x.NC_061060.1.00.bcf > glimpse_validate/concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input glimpse_validate/concordance.NC_061060.1.lst --minDP 4 --output glimpse_validate/concordance/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##Overall this had higher accuracy, but I dont think this is the correct way to do it, based off both Enbody and Fuller methods
+echo NC_061060.1 phase_common/target.scaffold.NC_061060.1.bcf GL_vcfs/H02_30x_NC_061060.1.vcf.gz imputed/ligated/H02_1x_oG.NC_061060.1.00.bcf > concordance.NC_061060.1.lst
+
+GLIMPSE_concordance --input concordance.NC_061060.1.lst --minDP 4 --output concordance/NC_061060.1.output --minPROB 0.9999 --bins 0.00000 0.00100 0.00200 0.00500 0.01000 0.05000 0.10000 0.20000 0.50000 --af-tag AF_nfe --thread 4
+
+##plot results
+module load conda/base/latest
+module load deprecated/matplotlib/2.0
+module load deprecated/bio/1.0 #need to load this for the NumPy import package
+
+```
+
+GCsSC id start_bin end_bin avg_bin RR_hom_matches RA_het_matches AA_hom_matches RR_hom_mismatches RA_het_mismatches AA_hom_mismatches RR_hom_mismatches_rate_percent RA_het_mismatches_rate_percent AA_hom_mimatches_rate_percent all_mismatches_rate_percent
+
+
+Now let's concat all the vcfs together into a single vcf and apply a imputation quality filter. And remove individuals that don't have a CTM or were blanks in the library prep plates.
+I first made copies of all the NW* vcfs and put them into the `ligated` directory
+
+qctool website: https://www.well.ox.ac.uk/~gav/qctool/
+`source activate python2` before compiling qctool and it finally compiled properly!
+
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=vcf_concat
+#SBATCH --mem=400G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_concat.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_concat.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load bcftools/1.13
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+
+## concat all chr together
+bcftools concat -f files_to_merge -Oz -o all_chr_offspring_imputed.vcf.gz
+bcftools index -f all_chr_offspring_imputed.vcf.gz
+
+## remove indiv with no CTM value or were blank wells in lib prep
+module load deprecated/bio/1.0
+
+vcftools --gzvcf all_chr_offspring_imputed.vcf.gz --remove no_pheno_list --recode --recode-INFO-all --out all_chr_offspring_imputed.filt1
+
+## filter by imputation quality score in the INFO/INFO field. -i stands for include
+bcftools view -i 'INFO/INFO>0.0625' -O z -o all_chr_offspring_imputed.filt2.vcf.gz all_chr_offspring_imputed.filt1.recode.vcf
+
+
+
+###### filter by LD?
+module load deprecated/plink/1.90
+
+#create plink files from vcf file
+plink --gzvcf all_chr_offspring_imputed.filt2.vcf.gz --allow-extra-chr --out all_chr_offspring_imputed.filt2.plink
+
+plink --bfile all_chr_offspring_imputed.filt2.plink --allow-extra-chr --recode --tab --out all_chr_offspring_imputed.filt2.plink
+
+#get a file of r2 between all SNPs in dataset
+plink --file all_chr_offspring_imputed.filt2.plink --allow-extra-chr --r2 --out all_chr_offspring_imputed.filt2.plink_r2 --threads 8
+
+#make a list of SNPs with a r2 less than 0.8
+plink --file all_chr_offspring_imputed.filt2.plink --set-missing-var-ids @:# --allow-extra-chr --indep-pairwise 100 10 0.8 --r2 --out all_chr_offspring_imputed.filt2.plink_100_10_0.8 --threads 8
+
+#Now extract these SNPs from the main vcf file and create a new vcf with only SNPs not in LD (by 0.8)
+plink --gzvcf all_chr_offspring_imputed.filt2.vcf.gz --set-missing-var-ids @:# --recode vcf --allow-extra-chr --out all_chr_offspring_imputed.filt2.plink.LDfiltered_0.8 --extract all_chr_offspring_imputed.filt2.plink_100_10_0.8.prune.in
+
+##1300115 variants loaded from .bim file.
+##674830 variants remaining
+
+
+
+## formatting of map and SNP id only ever needs to be run once
+bcftools annotate --set-id '%CHROM\_%POS\_%REF\_%FIRST_ALT' -O z -o all_chr_offspring_imputed.filt3.vcf.gz all_chr_offspring_imputed.filt2.vcf.gz
+##this makes a bit of a mess, but basically the problem is that qctools which makes the bimbim genotype chr_format
+##outputs a snp ID as ID:chrom:pos. And the only ID thats easy to make is chrom_ID_pos_ref_alt
+##could make it prettier by scripting my own qctool like thing, but why bother?
+bcftools query -f '%ID\:%CHROM\:%POS, %POS\, %CHROM\n' all_chr_offspring_imputed.filt3.vcf.gz > all_chr_offspring_imputed.filt3.map.txt
+
+/group/awhitehegrp2/joanna/Smelt_WGS/qctool/build/release/apps/qctool_v2.2.0 -g all_chr_offspring_imputed.filt3.vcf.gz -ofiletype bimbam_dosage -og all_chr_offspring_imputed.filt3.geno
+
+```
+
+
+## GWAS
+best practices paper to read? https://link.springer.com/article/10.1007/s00335-021-09914-z
+
+Using the program GEMMA:
+
+Manual: https://github.com/genetics-statistics/GEMMA/blob/master/doc/manual.pdf
+Helpful code: https://visoca.github.io/popgenomworkshop-gwas_gemma/
+
+Install with Bioconda:
+`conda create --name gemma_env`
+`source activate gemma_env`
+`module load conda/base/latest`
+`conda install -c bioconda gemma`
+`conda deactivate`
+
+`conda activate gemma_env_source`
+`conda install -c bioconda gemma`
+`git clone`
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      conda-forge/linux-64::_libgcc_mutex-0.1-conda_forge
+  _openmp_mutex      conda-forge/linux-64::_openmp_mutex-4.5-2_gnu
+  gemma              bioconda/linux-64::gemma-0.98.3-hb4ccc14_0
+  libgcc             conda-forge/linux-64::libgcc-14.1.0-h77fa898_1
+  libgcc-ng          conda-forge/linux-64::libgcc-ng-14.1.0-h69a702a_1
+  libgfortran        conda-forge/linux-64::libgfortran-14.1.0-h69a702a_1
+  libgfortran-ng     conda-forge/linux-64::libgfortran-ng-14.1.0-h69a702a_1
+  libgfortran5       conda-forge/linux-64::libgfortran5-14.1.0-hc5f4f2c_1
+  libgomp            conda-forge/linux-64::libgomp-14.1.0-h77fa898_1
+  libopenblas        conda-forge/linux-64::libopenblas-0.3.28-pthreads_h94d23a6_0
+  libstdcxx          conda-forge/linux-64::libstdcxx-14.1.0-hc0a3c3a_1
+  libstdcxx-ng       conda-forge/linux-64::libstdcxx-ng-14.1.0-h4852527_1
+  libzlib            conda-forge/linux-64::libzlib-1.2.13-h4ab18f5_6
+  openblas           conda-forge/linux-64::openblas-0.3.28-pthreads_hbcdf1e8_0
+  zlib               conda-forge/linux-64::zlib-1.2.13-h4ab18f5_6
+
+`make clean`
+`module load gsl/2.7.1`
+`module load openblas/0.3.21`
+
+* Note: When making input files, copy over from excel into a word document on the computer (rather than paste into vim). When I paste into vim it leaves a \n on the end of the last line (which is why when I do wc -l <file>, it looks like there's one more line than there actually is and why GEMMA thinks it doesn't match up with the geno file). No trailing new line gets added on when I do this on my computer.
+
+* GxE interaction: Was getting these errors just with -gxe flag: **** FAILED: Parsing input file '' failed in function AnalyzeBimbamGXE in src/lmm.cpp at line 2277
+Ended up being a typo in the actual code in the lmm.cpp file located here /home/jsgriffi/.conda/envs/gemma_env_source/GEMMA
+I think I must have edited the file following these directions: https://github.com/genetics-statistics/GEMMA/issues/241
+
+Must specify full path to gemma directory and additional modules when running gemma with -gxe (see below)
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=gemma
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_gemma.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_gemma.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+ 
+module load conda/base/latest
+source activate gemma_env
+ 
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis
+ 
+##create relatedness matrix (centered is best recommendation for starting off in the documentation)
+gemma -g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.geno -p GEMMA/pheno_CTM_file.txt -gk 1 -o GEMMA/all_chr_offspring_imputed.filt3.relate
+
+##run the linear mixed model
+gemma -p GEMMA/pheno_CTM_file.txt \
+-c GEMMA/covar_file.txt \
+-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.map.txt \
+-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.geno \
+-k GEMMA/output/all_chr_offspring_imputed.filt3.relate.cXX.txt \
+-lmm 4 \
+-outdir GEMMA/Model_results \
+-o all_chr_offspring_lmm4
+#-debug
+
+
+## DI
+#gemma -p GEMMA/pheno_DI_file.txt \
+#-c GEMMA/Tank_temp_covar_file.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.relate2.cXX.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results_DI \
+#-o DI_all_chr_offspring_lmm4_fixed_tank_reartemp
+
+
+##run model with LD filtered data
+
+#gemma -p GEMMA/pheno_CTM_file.txt \
+#-c GEMMA/Env_covar_file.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.plink.LDfiltered_0.8.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.plink.LDfiltered_0.8.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.relate2.cXX.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results \
+#-o all_chr_offspring_LDfiltered_lmm4
+
+
+####Linear model with GxE interaction
+module load gsl/2.7.1
+module load openblas/0.3.23
+
+#/home/jsgriffi/.conda/envs/gemma_env_source/GEMMA/bin/gemma -p GEMMA/pheno_CTM_file.txt \
+#-c GEMMA/System_covar_file.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.relate2.cXX.txt \
+#-gxe GEMMA/Env_gxe.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results \
+#-o all_chr_offspring_lmm4_fixed_gxe_system
+
+##doesn't work with both tank and fl as covariates
+#/home/jsgriffi/.conda/envs/gemma_env_source/GEMMA/bin/gemma -p GEMMA/pheno_CTM_file.txt \
+#-c GEMMA/Tank_FL_covar_file.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.relate2.cXX.txt \
+#-gxe GEMMA/Env_gxe.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results \
+#-o all_chr_offspring_lmm4_fixed_gxe_tank_FL
+
+
+#####################
+#15 and 18 rearing temp separate
+######################
+
+#gemma -g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.15only.geno -p GEMMA/pheno_CTM_file15only.txt -gk 1 -o all_chr_offspring_imputed.filt3.15only.relate
+#gemma -g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.18only.geno -p GEMMA/pheno_CTM_file18only.txt -gk 1 -o all_chr_offspring_imputed.filt3.18only.relate
+
+##run the linear mixed model
+#gemma -p GEMMA/pheno_CTM_file15only.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.15only.recode.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.15only.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.15only.relate.cXX.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results \
+#-o all_chr_offspring_lmm4_15only
+
+#conda deactivate
+
+
+##run the linear mixed model
+#gemma -p GEMMA/pheno_CTM_file18only.txt \
+#-a GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.18only.recode.map.txt \
+#-g GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.18only.geno \
+#-k GEMMA/output/all_chr_offspring_imputed.filt3.18only.relate.cXX.txt \
+#-lmm 4 \
+#-outdir GEMMA/Model_results \
+#-o all_chr_offspring_lmm4_18only
+
+
+
+
+conda deactivate
+
+date
+exit
+```
+
+Note that missing phenotypes need to be coded with NA otherwise you will get errors that the geno and pheno files don't match.
+
+See Smelt_GWAS.R scipt for downstream steps.
+
+Running LD-annot on top SNPs from GWAS. Had to install numpy via command line:
+`pip install numpy`
+Added to /home/jsgriffi/.local/bin, but didn't add it to PATH but it seemed to run ok without path being added to PATH file
+
+
+## Fst between Domestication Indices
+
+Fst.sh
+```{bashm eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=fst
+#SBATCH --mem=2G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_fst_vcf.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_fst_vcf.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis
+
+module load vcftools/0.1.16
+
+## Offspring
+vcftools --gzvcf GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3.vcf.gz --fst-window-size 10000 --fst-window-step 5000 --weir-fst-pop Fst_files/High_samples_fst --weir-fst-pop Fst_files/Low_samples_fst --out Fst_files/Low_High_DI
+
+##parents
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+
+vcftools --vcf Smelt_Parents_fil5.HWE.recode.vcf --fst-window-size 10000 --fst-window-step 5000 --weir-fst-pop Fst_files/High_parents_fst --weir-fst-pop Fst_files/Low_parents_fst --out Fst_files/Low_High_DI_parents
+
+vcftools --vcf Smelt_Parents_fil5.HWE.recode.vcf --keep Fst_files/High_Low_Parents --recode --recode-INFO-all --out Smelt_Parents_fil5.HWE.HighLow
+
+########## 
+## Perm using vcftools
+########
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis
+#dos2unix Fst_files/Fst_perm_files/* ##run this first on the command line
+  
+while IFS= read -r line; do
+vcftools --vcf /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/Smelt_Parents_fil5.HWE.HighLow.recode.vcf --fst-window-size 10000 --fst-window-step 5000 --weir-fst-pop Fst_files/Fst_perm_files/Pop_1_rep_${line} --weir-fst-pop Fst_files/Fst_perm_files/Pop_2_rep_${line} --out Fst_files/Fst_perm_files/Low_High_DI_parents.rep_${line}
+done < Fst_files/Fst_perm_files/rep_file.txt
+
+
+
+#create plink files from vcf file
+module load plink/1.9-beta7.1
+
+plink --vcf Smelt_Parents_fil5.HWE.HighLow.recode.vcf --double-id --allow-extra-chr --out Smelt_Parents_fil5.HWE.HighLow.plink
+
+plink --bfile Smelt_Parents_fil5.HWE.HighLow.plink --double-id --allow-extra-chr --recode --tab --out Smelt_Parents_fil5.HWE.HighLow.plink
+
+
+## turn plink into geno file for fst permutation analysis
+cd /group/awhitehegrp2/joanna/Smelt_WGS/scripts
+module load R/4.4.2
+Rscript plink2geno.R --save
+
+```
+
+ Plot output
+```{r, eval=F}
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Fst")
+
+library("tidyr")
+library("qqman")
+library("dplyr")
+
+## offspring
+#fst <- read.delim2("Low_High_DI.windowed.weir.fst", header=T)
+fst <- read.delim2("Low_High_DI_parents.windowed.weir.fst", header=T)
+
+names <- read.delim2("DS_chr_num_names.txt", header=F)
+colnames(names) <- c("chr_num", "CHROM")
+
+fst_chr_names <- merge(fst, names, by="CHROM", all.x = T)
+
+fst_chr_names$chr_num <- as.numeric(fst_chr_names$chr_num)
+fst_chr_names$BIN_START <- as.numeric(fst_chr_names$BIN_START)
+fst_chr_names$BIN_END <- as.numeric(fst_chr_names$BIN_END)
+fst_chr_names$WEIGHTED_FST <- as.numeric(fst_chr_names$WEIGHTED_FST)
+fst_chr_names <- na.omit(fst_chr_names)
+fst_chr_names$snp <- paste(fst_chr_names$chr_num, fst_chr_names$BIN_START, sep ="_")
+fst_chr_names$snp2 <- paste(fst_chr_names$CHROM, fst_chr_names$BIN_START, sep ="_")
+
+mean(fst_chr_names$WEIGHTED_FST) # for parents: 0.008091431
+top <- subset(fst_chr_names, WEIGHTED_FST > 0.1)#245, 0.3% of SNPs above Fst of 0.1
+
+########### for LD-annot
+fst_snps <- read.delim2("Low_High_DI_parents.weir.fst", header=T)
+
+# Match SNPs to their bins
+library(data.table)
+
+# Convert to data.table
+setDT(fst_snps)
+setDT(top)
+
+# Rename columns so they don't clash
+setnames(fst_snps, c("CHROM", "POS", "WEIR_AND_COCKERHAM_FST"),
+                  c("CHROM", "SNP_POS", "SNP_FST"))
+
+setnames(top, c("BIN_START", "BIN_END"),
+                        c("WIN_START", "WIN_END"))
+
+# Make sure windows are keyed by chromosome and interval
+setkey(top, CHROM, WIN_START, WIN_END)
+
+# Create an interval for SNPs (start=end=position)
+snps_dt <- fst_snps[, .(CHROM, SNP_START=SNP_POS, SNP_END=SNP_POS, SNP_FST)]
+
+# Overlap join: assigns SNPs to windows
+snps_in_windows <- foverlaps(
+  snps_dt,
+  top,
+  by.x = c("CHROM", "SNP_START", "SNP_END"),
+  type = "within",
+  nomatch = 0
+)
+
+snps_in_windows <- data.frame(snps_in_windows)
+snps_in_windows$snps <- paste(snps_in_windows$CHROM, snps_in_windows$SNP_START, sep = "_")
+snps_in_windows2 <- snps_in_windows[c("CHROM", "SNP_START", "snps")]
+snps_in_windows2 <- snps_in_windows2 %>%
+      distinct(snps, .keep_all = TRUE)
+
+write.table(snps_in_windows2,file = "Fst_top0.3_outliers_for_LDannot", quote = F,row.names = F,col.names = T, sep = "\t")
+
+## on the command line before running LD-annot
+for all files:
+`:%s/NC_/NC/g`
+`:%s/NW_/NW/g`
+###########
+
+windows()
+manhattan(fst_chr_names, chr="chr_num", bp="BIN_START", snp="snp", p="WEIGHTED_FST", highlight=top$snp, logp = F, ylim=c(0,0.5))
+manhattan(fst_chr_names, chr="chr_num", bp="BIN_START", snp="snp", p="WEIGHTED_FST",  genomewideline = 0.1, logp = F, ylim=c(0,0.3))
+
+hist(fst$WEIGHTED_FST)
+# suggestiveline = -log10(0.05/1085778), genomewideline = -log10(0.1/1085778),
+
+
+#################
+## vcftools permutation output. Ran this on FARM as a script
+##################
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Fst/Fst_perm_files")
+
+library("tidyr")
+
+n_perm <- 1000
+fst_perms <- matrix(NA, nrow = 1000, ncol = 1)
+
+
+for (i in 1:n_perm) {
+  fname <- paste0("Low_High_DI_parents.rep_", i, ".windowed.weir.fst") 
+  fst <- read.delim2(fname, header=T)
+  fst$CHROM <- gsub("NC_","",as.character(fst$CHROM))
+  fst$CHROM <- gsub("NW_","",as.character(fst$CHROM))
+  fst$CHROM <- gsub(".1","",as.character(fst$CHROM))
+
+  fst$WEIGHTED_FST <- as.numeric(fst$WEIGHTED_FST)
+  fst_perms[i,] <- mean(fst$WEIGHTED_FST)
+}
+save(fst_perms, file="Low_High_parents_fst_perms.RData")
+
+load("Low_High_parents_fst_perms.RData")
+#write.table(fst_perms, file = "Fst_permutations_1000_means.txt")
+
+fst_perms <- read.table("Fst_permutations_1000_means.txt")
+
+
+range(fst_perms)
+#-0.004355918  0.005800423
+
+mean(fst_perms)
+
+p_value <- sum(abs(fst_perms) >= abs(0.008091431)) / 1000 #0
+
+
+
+```
+
+
+`plink2geno.R`
+```{r, eval=F}
+
+library(vcfR)
+library(data.table)
+library("devtools")
+library("OutFLANK")
+
+setwd("/group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic")
+data <- read.vcfR("Smelt_Parents_fil5.HWE.recode.vcf")
+geno <- extract.gt(data)
+
+geno <- gsub("[|/]", "/", geno) #phased data has | instead of / so need to change it back
+
+G <- geno
+G[geno %in% c("0/0")] <- 0
+G[geno  %in% c("0/1")] <- 1
+G[geno %in% c("1/1")] <- 2
+G[is.na(G)] <- 9
+
+fwrite(G,"Smelt_Parents_fil5.HWE.geno.csv")
+
+G <- read.csv(file = "Smelt_Parents_fil5.HWE.geno.csv")
+tG <- t(G)
+#save(tG, file="outflank_tG.RData")
+
+
+#load("outflank_tG.RData")
+meta <- read.delim2("parent_meta_DI.txt")
+meta$LOCATION <-factor(meta$DI, levels = c("L", "H"))
+
+
+fst <- MakeDiploidFSTMat(tG,locusNames=1:ncol(tG),popNames=meta$DI)
+save(fst, file="parent_outflank.RData")
+
+
+```
+
+
+```{r, eval=F}
+#########################
+#Outflank
+########################
+library("devtools")
+#install_github("whitlock/OutFLANK")
+library("OutFLANK")
+#library(vcfR)
+#library(bigstatsr)
+#install_github("privefl/bigsnpr")
+#library(bigsnpr)   # package for SNP trimming
+library(qqman)
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Fst")
+
+
+##obtain trimmed SNPs (halfway through FARM steps)
+#load("outflank_tG.RData")
+
+##obtain output from FARM
+load("parent_outflank.RData")
+load("parent_outflank.HighLow.RData")
+
+##obtain output from this script
+load("Outflank_results.RData")
+
+
+#check order of SNPs in data
+#load("outflank_tG.RData") #yep, order of columns matches order of SNPs in vcf file!
+
+meta <- read.delim2("parent_meta_DI.txt")
+meta$DI <-factor(meta$DI, levels = c("L", "H"))
+
+
+head(fst)
+windows()
+hist(fst$FST,breaks=100)
+
+windows()
+hist(fst$FSTNoCorr, breaks=100) #no negatives!
+
+summary(fst$FST)
+#   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# -0.092  -0.014  -0.001   0.008   0.020   0.495   11329 
+
+
+windows()
+plot(fst$He, fst$FST)
+#Here, you can see how some of the low H loci have high FST. These are all neutral loci in the simulation, and it is important to exclude them from the OutFLANK algorithm
+#see this issue on Github for weird He results: https://github.com/whitlock/OutFLANK/issues/33
+#maybe mine is fine?
+#Sometimes when studying closely related species there may be admixture, and OutFLANK has been shown to have low performance in this scenario: https://github.com/whitlock/OutFLANK/issues/12
+
+#Data checks: FST vs. FSTNoCorr. All SNPs should follow a linear relationship.
+windows()
+plot(fst$FST, fst$FSTNoCorr)
+abline(0,1)
+
+##Select a set of SNPs to create null FST distribution that are not in LD:
+##import bim file with chr and snp location info (I edited the bim file to turn spaces into tabs and called the new file SNP_IDs)
+chrsnp <- read.delim2("Smelt_Parents_fil5.HWE.HighLow.plink.bim", header=F)
+
+chrsnp$line_num <- 1:nrow(chrsnp) #add line numbers
+chrsnp <- chrsnp[,c(1,4, 7)]
+colnames(chrsnp) <- c("CHR", "SNP", "LocusName")
+
+
+fst_chr <- merge(fst, chrsnp, by="LocusName")
+
+OF <- OutFLANK(fst, LeftTrimFraction= 0.05, RightTrimFraction= 0.05,
+               Hmin=0.1, NumberOfSamples=2, qthreshold=0.05) #number of samples here refers to number of populations 
+
+
+windows()
+OutFLANKResultsPlotter(OF,withOutliers=T,
+                       NoCorr=T,Hmin=0.1,binwidth=0.005,
+                       Zoom=F,RightZoomFraction=0.05,titletext=NULL)
+
+windows()
+OutFLANKResultsPlotter(OF,withOutliers=T,
+                       NoCorr=T,Hmin=0.1,binwidth=0.005,
+                       Zoom=F,RightZoomFraction=0.25,titletext=NULL)
+
+#check pvalue of histogram, we expect histogram to be flat
+windows()
+hist(OF$results$pvaluesRightTail)
+
+P1 <- pOutlierFinderChiSqNoCorr(fst, Fstbar= OF$FSTNoCorrbar,
+                                dfInferred= OF$dfInferred, qthreshold=0.05, Hmin=0.1)
+outliers <- P1$OutlierFlag==TRUE #which of the SNPs are outliers?
+table(outliers) #11 true outliers
+
+windows()
+plot(P1$He, P1$FST, pch=19, col=rgb(0,0,0,0.1))
+points(P1$He[outliers], P1$FST[outliers], col="blue")
+
+#manhattan plot
+windows()
+plot(P1$LocusName[P1$He>0.1], P1$FST[P1$He>0.1],
+     xlab="Position", ylab="FST", col=rgb(0,0,0,0.2))
+points(P1$LocusName[outliers], P1$FST[outliers], col="magenta", pch=20)  
+
+#write.table(OF,file = "CCGP_popLD-outflank.snp", quote = F,row.names = F,col.names = F)
+
+save(OF, P1, outliers, file="Outflank_results.RData")
+
+#fst_chr$CHR <- gsub("NC_","",as.character(fst_chr$CHR))
+#fst_chr$CHR <- gsub("NW_","",as.character(fst_chr$CHR))
+#fst_chr$CHR <- gsub(".1","",as.character(fst_chr$CHR))
+
+names <- read.delim2("DS_chr_num_names.txt", header=F)
+colnames(names) <- c("chr_num", "CHR")
+
+fst_chr_names <- merge(fst_chr, names, by="CHR", all.x = T)
+
+fst_chr_names$chr_num <- as.numeric(fst_chr_names$chr_num)
+fst_chr_names$FST <- as.numeric(fst_chr_names$FST)
+fst_chr_names$SNP <- as.numeric(fst_chr_names$SNP)
+fst_chr_names <- na.omit(fst_chr_names, cols = c("chr_num", "SNP")) 
+
+windows()
+manhattan(fst_chr_names, chr="chr_num", bp="SNP", p="FST", snp="LocusName", highlight=c("130749", "213013", "213215", "360176", "485570", "593735", "801669", "904374", "1010015", "1010033", "1160887"), logp = F,ylim=c(0,1), suggestiveline=F, genomewideline=F)
+
+
+outlier_df <- subset(P1, OutlierFlag==TRUE)
+outlier_df2 <- merge(outlier_df, fst_chr_names, by="LocusName")
+outlier_df2 <- outlier_df2[c("CHR", "SNP")]
+outlier_df2$chr_SNP <- paste(outlier_df2$CHR, outlier_df2$SNP, sep = "_")
+
+write.table(outlier_df2,file = "Fst_outflank_outliers_for_LDannot", quote = F,row.names = F,col.names = T, sep = "\t")
+
+## on the command line before running LD-annot
+for all files:
+`:%s/NC_/NC/g`
+`:%s/NW_/NW/g`
+
+#See Smelt_GWAS.R for TopGo results
+
+```
+
+### Fst permutation
+```{r, eval=F}
+#install.packages("hierfstat")
+library(hierfstat)
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Fst")
+
+
+# import data and transform it and add in population column
+G <- read.csv(file = "Smelt_Parents_fil5.HWE.geno.csv")
+tG <-  data.frame(t(G))
+rm(G)
+
+meta <- read.delim2("parent_meta_DI_num.txt")
+meta <- data.frame(meta[,3])
+
+data <- data.frame(meta, tG)
+rm(tG)
+
+#test
+data <- data[,1:101]
+
+
+library(dplyr)
+data <- data %>% mutate_if(is.character, as.numeric)
+
+
+
+
+## Simulate a toy dataset
+set.seed(123)
+n_ind <- 60
+n_loci <- 100
+pop <- rep(c(1, 2), each = n_ind / 2)
+geno <- matrix(sample(0:2, n_ind * n_loci, replace = TRUE), nrow = n_ind)
+data <- data.frame(pop, geno)
+
+## calculate observed Fst
+obs_fst <- basic.stats(data)$overall["Fst"]
+fst_per_locus <- basic.stats(data)$perloc["Fst"]
+
+## permutation
+n_perm <- 1000
+fst_null <- matrix(NA, nrow = n_perm, ncol = n_loci)
+
+for (i in 1:n_perm) {
+  permuted_pop <- sample(data$meta...2.)
+  data_perm <- data
+  data_perm$pop <- permuted_pop
+  stats_perm <- basic.stats(data_perm)
+  fst_null[i, ] <- stats_perm[["perloc"]][["Fst"]]
+}
+
+p_values <- sapply(1:n_loci, function(i) {
+  mean(fst_null[, i] >= fst_per_locus[i,], na.rm = TRUE)
+})
+
+threshold_95 <- apply(fst_null, 2, function(x) quantile(x, 0.95, na.rm = TRUE))
+outliers <- which(fst_per_locus > threshold_95)
+
+
+# Plot setup
+t_fst_null <- t(fst_null)
+fst_expected <- data.frame(rowMeans(t_fst_null))
+q_lower <- apply(t_fst_null, 1, quantile, 0.025)
+q_upper <- apply(t_fst_null, 1, quantile, 0.975)
+
+plot(NULL, xlim = c(0, max(fst_expected)), ylim = c(0, max(fst_per_locus)),
+     xlab = "expected (null Fst)", ylab = "observed (Fst)", main = "Observed vs Null FST")
+
+# Add the y = x line
+abline(0, 1, col = "black", lty = 2)
+
+
+# Add empirical FST vs expected (e.g., null mean)
+
+points(fst_expected$rowMeans.t_fst_null., fst_per_locus$Fst, pch = 19, col = "black", cex = 0.5)
+lines(fst_expected$colMeans.fst_null., fst_per_locus$Fst, col = "black", lwd = 2)
+# Add polygon for 95% null envelope
+polygon(c(q_lower, rev(q_upper)), c(fst_per_locus$Fst, rev(fst_per_locus$Fst)), col = adjustcolor("gray", alpha.f = 0.3), border = NA)
+
+
+##### just create input files for running vcftools
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/Fst/Fst_perm_files")
+
+meta <- read.delim2("../parent_meta_DI_num.txt")
+meta <- data.frame(meta[,1])
+
+# Number of rows and repetitions
+n <- nrow(meta)
+n_reps <- 1000
+
+# Generate matrix of random 1s and 2s
+set.seed(123)  # for reproducibility
+
+for (i in 1:n_perm) {
+  assignments <- data.frame(sample(1:2, n, replace = TRUE))
+  colnames(assignments) <- "Pop"
+  meta_random <- cbind(meta, assignments)
+  meta_random1 <- subset(meta_random, Pop=="1")
+  write.table(meta_random1$meta...1.,file = paste0("Pop_1_rep_", i), quote = F,row.names = F,col.names = F)
+  meta_random2 <- subset(meta_random, Pop=="2")
+  write.table(meta_random2$meta...1.,file = paste0("Pop_2_rep_", i), quote = F,row.names = F,col.names = F)
+}
+
+```
+
+
+
+## Parentage Assignment
+https://onlinelibrary.wiley.com/doi/abs/10.1111/1755-0998.12910?casa_token=XAlP62tnmh0AAAAA:itO3iN_rMUhIV5fW2bcsikEKuEIVdvhYaG2YZvpo8vn1NplRdjaMEPgPFl5tziKtusWmkf8xibywNw
+
+WHODAD paper: https://academic.oup.com/genetics/article/203/2/699/6066257?login=false
+KGD paper: https://academic.oup.com/g3journal/article/9/10/3239/6026654
+paper using KGD: https://academic.oup.com/g3journal/article/10/6/2069/6026356
+### Pedigree
+
+First I tried to create a pedigree with genotype likelihoods with just one scaffold and then all the scaffolds. See code below. However, this didn't work so I created a pedigree with the imputed genotypes, which had much higher accuracies.
+
+Run `AlphaAssign.sh`:
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=par_assign
+#SBATCH --mem=150G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_par_assign.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_par_assign.txt
+#SBATCH --time=220:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p bigmemh
+
+###############
+#One scaffold and GL
+###################
+module load deprecated/bio/1.0
+## select one chromosome from Parent file
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --chr NC_061061.1 --out Smelt_Parents_fil4.HWE.NC_061061.1 --recode --recode-INFO-all
+
+## bgzip (@ is number of threads to use) and index
+module load bcftools/1.13
+module load samtools/1.13
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+bgzip -@ 8 Smelt_Parents_fil4.HWE.NC_061061.1.recode.vcf
+bcftools index -f Smelt_Parents_fil4.HWE.NC_061061.1.recode.vcf.gz
+
+## merge parents and offspring together
+## run this then make sure each file is on its own line
+echo Smelt_Parents_fil4.HWE.NC_061061.1.recode.vcf.gz /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/merged.NC_061061.1.vcf.gz > parent_offspring_NC_061061.1_list
+
+#module load bcftools/1.13
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+bcftools merge -m none -r NC_061061.1 -Oz -o parent_offspring.merged.NC_061061.1.vcf.gz -l parent_offspring_NC_061061.1_list
+bcftools index -f parent_offspring.merged.NC_061061.1.vcf.gz
+
+## PLINK
+module load deprecated/plink/1.90
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+
+plink --vcf parent_offspring.merged.NC_061061.1.vcf.gz --recode --double-id --allow-extra-chr --out AlphaAssign/parent_offspring.merged.NC_061061.1.plink
+
+##Before moving on, edit the next steps in the map file on the command line next!
+#`:s/NC_//g`  #this should only change the first line, do this as a check before changing whole document
+#`:%s/NC_//g`
+#`:s/\.1//g`
+#`:%s/\.1//g`
+
+plink --file AlphaAssign/parent_offspring.merged.NC_061061.1.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_offspring.merged.NC_061061.1.plink
+
+####### AlphaAssign
+##If getting python/numpy errors, make sure all other modules are unloaded above
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/AlphaAssign
+module load conda/base/latest
+
+pip install -r /home/jsgriffi/RAD_abalone/AlphaAssign-Python/requirements.txt --user
+
+python /home/jsgriffi/RAD_abalone/AlphaAssign-Python/AlphaAssign.py \
+    bfile=parent_offspring.merged.NC_061061.1.plink \
+    potentialSires=SampleSireList.txt \
+    potentialDams=SampleDamList.txt \
+    out=Smelt_AlphaAssigned
+    
+    
+###################
+#All scaffolds and GL
+###################
+
+## merge all offspring files together with
+module load bcftools/1.13
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+bcftools concat -f merged_offspring_files -Oz -o all_chr_offspring.vcg.gz
+bcftools index -f all_chr_offspring.vcf.gz
+
+bcftools merge -m none -Oz -o parent_offspring.merged.vcf.gz -l parent_offspring_list
+bcftools index -f parent_offspring.merged.vcf.gz
+
+##keep only parents and 100 offspring (parentage assignment keeps running out of time)
+module load deprecated/bio
+bcftools view -S parent_100offspring_list -o parent_offspring.merged.short.vcf.gz parent_offspring.merged.vcf.gz
+
+
+
+## PLINK
+module load deprecated/plink/1.90
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+
+plink --file AlphaAssign/parent_offspring.merged.short.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_offspring.merged.short.plink
+
+##Before moving on, edit the next steps in the map file on the command line next!
+#`:s/NC_//g`  #this should only change the first line, do this as a check before changing whole document
+#`:%s/NW_//g`
+#`:s/NW_//g`
+#`:%s/NC_//g`
+#`:s/\.1//g`
+#`:%s/\.1//g`
+
+plink --file AlphaAssign/parent_offspring.merged.short.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_offspring.merged.short.plink
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/AlphaAssign
+module load conda
+
+## Create shorter Dam and Sire lists for AlphaAssign with just the 100 individuals
+while IFS= read -r line; do
+grep $line AlphaAssign/SampleDamList.txt >> AlphaAssign/SampleShortDamList.txt
+grep $line AlphaAssign/SampleSireList.txt >> AlphaAssign/SampleShortSireList.txt
+done < 100offspring_list
+
+python /home/jsgriffi/RAD_abalone/AlphaAssign-Python/AlphaAssign.py \
+    bfile=parent_offspring.merged.short.plink \
+    potentialSires=SampleShortSireList.txt \
+    potentialDams=SampleShortDamList.txt \
+    out=Smelt_AlphaAssigned_short_test
+
+
+#####################
+#Imputed genotype and 100 offspring
+#####################
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+vcftools --gzvcf all_chr_offspring_imputed.filt2.vcf.gz --keep 100offspring_list --recode --recode-INFO-all --out 100offspring_imputed.filt2
+bgzip -@ 8 100offspring_imputed.filt2.recode.vcf
+bcftools index -f 100offspring_imputed.filt2.recode.vcf.gz
+
+mv 100offspring_imputed.filt2.recode.vcf.gz /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+bcftools merge -m none -Oz -o parent_100offspring_imputed.merged.vcf.gz -l parent_100offspring_list                 bcftools index -f parent_100offspring_imputed.merged.vcf.gz
+
+##Had some empty genotype wells in vcf so needed to remove them
+module load deprecated/bio/1.0
+vcftools --gzvcf parent_100offspring_imputed.merged.vcf.gz --remove omit_samples --recode --recode-INFO-all --out parent_100offspring_imputed_noempty.merged
+bgzip -@ 8 parent_100offspring_imputed_noempty.merged.recode.vcf
+bcftools index -f parent_100offspring_imputed_noempty.merged.recode.vcf.gz
+
+
+##PLINK
+module load deprecated/plink/1.90
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+plink --vcf parent_100offspring_imputed_noempty.merged.recode.vcf.gz --recode --double-id --allow-extra-chr --out AlphaAssign/parent_100offspring_imputed_noempty.merged.plink
+
+
+##Before moving on, edit the next steps in the map file on the command line next!
+#`:s/NC_//g`  #this should only change the first line, do this as a check before changing whole document
+#`:%s/NW_//g`
+#`:s/NW_//g`
+#`:%s/NC_//g`
+#`:s/\.1//g`
+#`:%s/\.1//g`
+
+plink --file AlphaAssign/parent_100offspring_imputed_noempty.merged.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_100offspring_imputed_noempty.merged.plink
+
+##AlphaAssigned
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/AlphaAssign
+module load conda
+
+python /home/jsgriffi/RAD_abalone/AlphaAssign-Python/AlphaAssign.py \
+    bfile=parent_100offspring_imputed_noempty.merged.plink\
+    potentialSires=SampleShortSireList.txt \
+    potentialDams=SampleShortDamList.txt \
+    out=Smelt_AlphaAssigned_short_imputed
+```
+
+
+
+Get list of all sample names from vcf header
+`module load bcftools/1.13`
+`bcftools query -l all_chr_offspring_imputed.filt2.vcf.gz > final_offspring_list`
+
+Split list of offspring into smaller files to feed to AlphaAssign
+`split -l 500 final_offspring_list`
+Created these files:
+xab
+xaa
+xad
+xac
+xae
+xag
+xaf
+
+```{bash eval=FALSE}
+
+module load bcftools/1.13
+module load deprecated/bio/1.0
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+
+while IFS= read -r line; do
+  vcftools --gzvcf all_chr_offspring_imputed.filt2.vcf.gz --keep $line --recode --recode-INFO-all --out ${line}_imputed.filt2
+
+  bgzip -@ 8 ${line}_imputed.filt2.recode.vcf
+  bcftools index -f ${line}_imputed.filt2.recode.vcf.gz
+done < xa_list
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+bcftools merge -m none -Oz -o parent_xaa_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xaa_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xab_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xab_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xac_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xac_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xad_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xad_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xae_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xae_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xaf_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xaf_imputed.merged.vcf.gz
+
+bcftools merge -m none -Oz -o parent_xag_imputed.merged.vcf.gz -l parent_xaa_list
+bcftools index -f parent_xag_imputed.merged.vcf.gz
+
+##PLINK
+#module load deprecated/plink/1.90
+#cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/
+
+#while IFS= read -r line; do
+#       plink --vcf parent_${line}_imputed.merged.vcf.gz --recode --double-id --allow-extra-chr --out AlphaAssign/parent_${line}_imputed.merged.plink
+#done < xa_list
+
+##Before moving on, edit the next steps in the map file on the command line next!
+#`:s/NC_//g`  #this should only change the first line, do this as a check before changing whole document
+#`:%s/NW_//g`
+#`:s/NW_//g`
+#`:%s/NC_//g`
+#`:s/\.1//g`
+#`:%s/\.1//g`
+
+#while IFS= read -r line; do
+#       plink --file AlphaAssign/parent_${line}_imputed.merged.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_${line}_imputed.merged.plink
+#done < xa_list
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xaa_SireList.txt
+done < xaa
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xaa_DamList.txt
+done < xaa
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xab_SireList.txt
+done < xab
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xab_DamList.txt
+done < xab
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xac_SireList.txt
+done < xac
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xac_DamList.txt
+done < xac
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xad_SireList.txt
+done < xad
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xad_DamList.txt
+done < xad
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xae_SireList.txt
+done < xae
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xae_DamList.txt
+done < xae
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xaf_SireList.txt
+done < xaf
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xaf_DamList.txt
+done < xaf
+
+
+while IFS= read -r line; do
+        grep $line SampleSireList.txt >> Sample_xag_SireList.txt
+done < xag
+
+while IFS= read -r line; do
+        grep $line SampleDamList.txt >> Sample_xag_DamList.txt
+done < xag
+```
+
+
+Submit this part of code wth :
+`sbatch -J AlphaAssign.${USER} --array=1-7 AlphaAssign.sh`
+```{bash eval=FALSE}
+start=`date +%s`
+hostname
+
+module load conda
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/AlphaAssign
+
+name=`head -n ${SLURM_ARRAY_TASK_ID} xa_list | tail -1`
+
+python /home/jsgriffi/RAD_abalone/AlphaAssign-Python/AlphaAssign.py \
+    bfile=parent_${name}_imputed.merged.plink\
+    potentialSires=Sample_${name}_SireList.txt \
+    potentialDams=Sample_${name}_DamList.txt \
+    out=Smelt_AlphaAssigned_${name}_imputed
+
+end=`date +%s`
+runtime=$((end - start ))
+echo $runtime
+```
+
+
+
+### PCA of offspring and parents
+See `plink_LD.sh`:
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#qSBATCH --job-name=LD
+#SBATCH --mem=10G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_LD.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_LD.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load conda/plink/1.90b6.21
+#Smelt_Parents_fil3.recode.vcf
+#plink --vcf Smelt_Parents_fil3.recode.vcf --allow-extra-chr --double-id --out Smelt_Parents_fil3.plink
+#plink --bfile Smelt_Parents_fil3.plink --allow-extra-chr --recode --tab --out Smelt_Parents_fil3.plink
+#plink --file Smelt_Parents_fil3.plink --allow-extra-chr --r2 --out Smelt_Parents_fil3.plink --threads 8
+
+
+## PCA
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+plink --vcf all_chr_offspring_imputed.filt3.plink.LDfiltered_0.8.vcf --allow-extra-chr --double-id --recode --out offspring_pca
+plink --file offspring_pca --allow-extra-chr --make-bed --recode --out offspring_pca
+plink --file offspring_pca --allow-extra-chr --pca --out offspring_pca
+
+
+## PCA of parents
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic/
+
+plink --vcf Smelt_Parents_fil5.HWE.recode.vcf --allow-extra-chr --double-id --recode --out Smelt_Parents_fil5.HWE.plink
+plink --file Smelt_Parents_fil5.HWE.plink --allow-extra-chr --recode --make-bed --out Smelt_Parents_fil5.HWE.plink
+plink --file Smelt_Parents_fil5.HWE.plink --allow-extra-chr --pca --out parent_pca
+
+date
+exit
+```
+
+```{r, eval=F}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(ggrepel)
+library(vegan)
+library(RColorBrewer)
+library("cowplot")
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/PCA")
+
+##filtering by max-missing 0.75 and no pop filter, but LD filter 0.8. WITHOUT SEX REGION
+eigenvec <- read.table("offspring_pca.eigenvec")
+eigenval <- read.table("offspring_pca.eigenval")
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/GWAS")
+eigenvec <- read.table("ctmax_pca.eigenvec")
+eigenval <- read.table("ctmax_pca.eigenval")
+
+eigenvec <- read.table("ctmax_gxe_pca.eigenvec")
+eigenval <- read.table("ctmax_gxe_pca.eigenval")
+
+# % variance explained, explained 
+# https://stats.stackexchange.com/questions/22569/pca-and-proportion-of-variance-explained
+# https://aaronschlegel.me/principal-component-analysis-r-example.html
+
+prop_explained <- c()
+for (s in eigenval$V1) {
+  #print(s / sum(eigenval$V1))
+  prop_explained <- c(prop_explained,round(((s / sum(eigenval$V1))*100),2))
+}
+
+windows()
+barplot(prop_explained, ylab = "% variance explained by PC", xlab = "PC",
+        names.arg=c(1:length(prop_explained)))
+
+
+pop_info <- read.delim2("offspring_meta_rearing.txt")
+pop_info <- read.delim2("../PCA/offspring_meta_rearing.txt")
+pop_info$DI <- as.factor(pop_info$DI)
+pop_info$assigned_DI <- as.factor(pop_info$assigned_DI)
+pop_info$Rep <- as.factor(pop_info$Rep)
+pop_info$Temp <- as.factor(pop_info$Temp)
+pop_info$CTM <- as.numeric(pop_info$CTM)
+
+pop_info <- na.omit(pop_info)
+
+pop_info$DI <-factor(pop_info$assigned_DI, levels = c("L", "M", "H"))
+
+
+names(eigenvec)[names(eigenvec)=="V1"] <- "LIB_SAMPLE"
+vcf_sample_info <- inner_join(eigenvec,pop_info, by = "LIB_SAMPLE")
+
+pca <-data.frame(sample=vcf_sample_info$LIB_SAMPLE, 
+                 DI=vcf_sample_info$assigned_DI,
+                 CTM=vcf_sample_info$CTM,
+                 PC1=vcf_sample_info$V3,
+                 PC2=vcf_sample_info$V4,
+                 PC3=vcf_sample_info$V5,
+                 PC4=vcf_sample_info$V6,
+                 PC5=vcf_sample_info$V7,
+                 stringsAsFactors=FALSE)
+
+pca$DI <-factor(pca$DI, levels = c("L", "M", "H"))
+
+
+###############
+#Graphing
+###############
+
+windows()
+display.brewer.all()
+
+# Define the number of colors you want
+nb.cols <- 3
+mycolors <- rev(colorRampPalette(brewer.pal(11, "Spectral"))(nb.cols)) #11 is the number of colors in the spectral palette
+
+
+#color by pop PC1 and 2
+# create a new plotting window and set the plotting area into a 1*2 array
+
+ggplot(data = pca)+
+  geom_point(data = pca, aes(x = PC1, y = PC2, color = DI), size = 3)+
+  scale_color_manual(values = mycolors)+
+ # scale_color_manual(name = "population", values=c(grb,org,red,yel,blu,lir))+
+  xlab(paste("PC1: ", prop_explained[1],"%",sep = ""))+
+  ylab(paste("PC2: ", prop_explained[2],"%",sep = ""))+
+  theme_bw()+
+  theme(axis.text.x=element_text(size=10), axis.text.y=element_text(size=10),
+        axis.title.x=element_text(size=20), axis.title.y=element_text(size=20))
+
+
+col = colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255)
+col = colorRampPalette( rev(brewer.pal(9, "PuOr")) )(25)
+
+ggplot(data = pca)+
+  geom_point(data = pca, aes(x = PC1, y = PC2, color = CTM), size = 3)+
+  scale_color_gradientn(colors = col) +
+ # scale_color_manual(name = "population", values=c(grb,org,red,yel,blu,lir))+
+  xlab(paste("PC1: ", prop_explained[1],"%",sep = ""))+
+  ylab(paste("PC2: ", prop_explained[2],"%",sep = ""))+
+  theme_bw()+
+  theme(axis.text.x=element_text(size=10), axis.text.y=element_text(size=10),
+        axis.title.x=element_text(size=20), axis.title.y=element_text(size=20))
+
+
+```
+```{r, eval=F}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(ggrepel)
+library(vegan)
+library(RColorBrewer)
+library("cowplot")
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/PCA")
+
+##filtering by max-missing 0.75 and no pop filter, but LD filter 0.8. WITHOUT SEX REGION
+eigenvec <- read.table("parent_pca.eigenvec")
+eigenval <- read.table("parent_pca.eigenval")
+
+# % variance explained, explained 
+# https://stats.stackexchange.com/questions/22569/pca-and-proportion-of-variance-explained
+# https://aaronschlegel.me/principal-component-analysis-r-example.html
+
+prop_explained <- c()
+for (s in eigenval$V1) {
+  #print(s / sum(eigenval$V1))
+  prop_explained <- c(prop_explained,round(((s / sum(eigenval$V1))*100),2))
+}
+
+windows()
+barplot(prop_explained, ylab = "% variance explained by PC", xlab = "PC",
+        names.arg=c(1:length(prop_explained)))
+
+
+pop_info <- read.delim2("parent_DI.txt")
+pop_info$Parent_DI <- as.factor(pop_info$Parent_DI)
+
+pop_info <- na.omit(pop_info)
+
+pop_info$Parent_DI <-factor(pop_info$Parent_DI, levels = c("L", "M", "H"))
+
+
+names(eigenvec)[names(eigenvec)=="V1"] <- "LIB_SAMPLE"
+vcf_sample_info <- inner_join(eigenvec,pop_info, by = "LIB_SAMPLE")
+
+pca <-data.frame(sample=vcf_sample_info$LIB_SAMPLE, 
+                 DI=vcf_sample_info$Parent_DI,
+                 PC1=vcf_sample_info$V3,
+                 PC2=vcf_sample_info$V4,
+                 PC3=vcf_sample_info$V5,
+                 PC4=vcf_sample_info$V6,
+                 PC5=vcf_sample_info$V7,
+                 stringsAsFactors=FALSE)
+
+pca$DI <-factor(pca$DI, levels = c("L", "M", "H"))
+
+
+###############
+#Graphing
+###############
+
+windows()
+display.brewer.all()
+
+# Define the number of colors you want
+nb.cols <- 3
+mycolors <- rev(colorRampPalette(brewer.pal(11, "Spectral"))(nb.cols)) #11 is the number of colors in the spectral palette
+
+
+#color by pop PC1 and 2
+# create a new plotting window and set the plotting area into a 1*2 array
+
+ggplot(data = pca)+
+  geom_point(data = pca, aes(x = PC1, y = PC2, color = DI), size = 3)+
+  scale_color_manual(values = mycolors)+
+ # scale_color_manual(name = "population", values=c(grb,org,red,yel,blu,lir))+
+  xlab(paste("PC1: ", prop_explained[1],"%",sep = ""))+
+  ylab(paste("PC2: ", prop_explained[2],"%",sep = ""))+
+  theme_bw()+
+  theme(axis.text.x=element_text(size=10), axis.text.y=element_text(size=10),
+        axis.title.x=element_text(size=20), axis.title.y=element_text(size=20))
+
+
+
+```
+
+## PLACO+ Genetic Correlations with GWAS output
+
+
+First, let's create input file, merge with only shared SNPs
+`awk 'NR==FNR { a[$1]=$0; next }
+     $1 in a { print a[$1], $0 }' gwas_ctmax_genotype_ldsc gwas_DI_ldsc > merged.txt`
+
+Remove trail ^M:
+`tr -d '\r' < merged.txt > cleaned.txt`
+`sed 's/ /\t/g' cleaned.txt > cleaned2`
+
+Keep only columns with Pvalues and Zscores
+`cut -f5,6,11,12 cleaned2 > gwas_summary.txt`
+Then remove header manually
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=placo
+#SBATCH --mem=10G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_placo.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_placo.txt
+#SBATCH --time=24:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/placo/PLACO
+
+module load R/4.4.2
+Rscript placo_cluster.R --save
+#Rscript placo_cluster_gxe.R --save
+
+date
+exit
+```
+
+Rscript placo_cluster.R:
+```{r, eval=F}
+# placo_cluster.R
+# This script performs PLACO+ analysis on real GWAS summary statistics
+# using multiple cores for efficiency.
+
+# --- 0. Setup and Data Loading ---
+
+# Source the file containing the PLACO functions (cor.pearson, var.placo, placo.plus)
+# NOTE: Ensure 'PLACO_v0.2.0.R' is available in the working directory
+setwd("/group/awhitehegrp2/joanna/Smelt_WGS/Analysis/placo/PLACO")
+source("PLACO_v0.2.0.R")
+
+# Load necessary parallel processing libraries
+library(doParallel)
+library(foreach)
+
+# Define file paths
+#input_file <- "gwas_summary.txt"
+input_file <- "gwas_summary_gxe.txt"
+#output_file <- "placo_results_correlated.txt"
+output_file <- "placo_results_gxe_correlated.txt"
+
+cat("Loading data from:", input_file, "\n")
+# Read the summary statistics (assuming tab-separated data without a header)
+data <- read.table(input_file, header = FALSE, sep = "\t")
+
+# Separate Z-scores and P-values
+# Assuming columns 1 and 2 are Z-scores, and 3 and 4 are P-values
+
+Z.matrix <- as.matrix(data[, 1:2])
+P.matrix <- as.matrix(data[, 3:4])
+
+p <- nrow(Z.matrix) # Total number of variants
+cat("Total variants (p) found:", p, "\n")
+
+# --- Step 1: Parameter Estimation (Sequential - Run only once) ---
+
+cat("Step 1: Estimating variance (VarZ) and correlation (CorZ)...\n")
+# Estimate marginal variances
+VarZ <- var.placo(Z.matrix, P.matrix, p.threshold=1e-4)
+
+# Estimate the scalar correlation parameter (CorZ) for PLACO+
+CorZ <- cor.pearson(Z.matrix, P.matrix, p.threshold=1e-4, returnMatrix=FALSE)
+
+cat("VarZ estimated:", VarZ, "\n")
+cat("CorZ estimated:", CorZ, "\n")
+
+# --- Step 2: Parallelized PLACO+ Test (Revised) ---
+
+num_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK", unset = 8))
+cat("Starting parallel processing on", num_cores, "cores...\n")
+cl <- makeCluster(num_cores)
+registerDoParallel(cl)
+
+# The 'foreach' loop now explicitly returns a vector [T.placo.plus, p.placo.plus]
+# instead of a list, ensuring clean column-binding.
+out.parallel <- foreach(i = 1:p, .combine = 'cbind') %dopar% {
+    # Source the PLACO functions again within each worker, as they don't inherit
+    # from the main environment unless explicitly loaded or passed.
+    source("PLACO_v0.2.0.R")
+
+    current_Z <- Z.matrix[i, ]
+
+    # Run PLACO+
+    result_list <- placo.plus(Z=current_Z, VarZ=VarZ, CorZ=CorZ)
+
+    # *** CRITICAL CHANGE: Return a simple numeric vector ***
+    # This ensures .combine='cbind' creates a clean numeric matrix.
+    return(c(result_list$T.placo.plus, result_list$p.placo.plus))
+}
+
+# Stop the parallel cluster
+stopCluster(cl)
+cat("Parallel processing finished.\n")
+
+# --- 3. Format and Save Results (Revised) ---
+
+# The output 'out.parallel' is a 2-row matrix (T.placo.plus, p.placo.plus)
+# by p-column (variants). We transpose it to get variants as rows.
+results_matrix <- t(out.parallel)
+colnames(results_matrix) <- c("T.placo.plus", "p.placo.plus")
+
+# Convert the numeric matrix directly to a data frame
+results_df <- as.data.frame(results_matrix)
+
+# fix any calculate p-values less than 0 to 0
+#results_df$p.placo.plus <- pmax(results_df$p.placo.plus, 0)
+
+p <- nrow(results_df)
+
+# Optional: Add the variant index
+results_df$Variant_Index <- 1:p
+
+# Reorder columns for clarity
+results_df <- results_df[, c("Variant_Index", "T.placo.plus", "p.placo.plus")]
+
+# Write the final results (now a clean data frame)
+write.table(results_df, output_file, row.names = FALSE, sep = "\t", quote = FALSE)
+cat("Results saved to:", output_file, "\n")
+
+```
+
+
+
+## Unused code
+
+Got this from the snpArcher snakefile:
+```{bash eval=FALSE}
+
+for filename in *g.vcf.gz
+  do
+  gatk VariantFiltration \
+    -R data/genome/GCF_021917145.1_fHypTra1_genomic.fna \
+    -V gvcfs/$filename \
+    -O /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/$filename \
+    --filter-name "RPRS_filter" \
+    --filter-expression "(vc.isSNP() && (vc.hasAttribute('ReadPosRankSum') && ReadPosRankSum < -8.0)) || ((vc.isIndel() || vc.isMixed()) && (vc.hasAttribute('ReadPosRankSum') && ReadPosRankSum < -20.0)) || (vc.hasAttribute('QD') && QD < 2.0)" \
+    --filter-name "FS_SOR_filter" \
+    --filter-expression "(vc.isSNP() && ((vc.hasAttribute('FS') && FS > 60.0) || (vc.hasAttribute('SOR') &&  SOR > 3.0))) || ((vc.isIndel() || vc.isMixed()) && ((vc.hasAttribute('FS') && FS > 200.0) || (vc.hasAttribute('SOR') &&  SOR > 10.0)))" \
+    --filter-name "MQ_filter" \
+    --filter-expression "vc.isSNP() && ((vc.hasAttribute('MQ') && MQ < 40.0) || (vc.hasAttribute('MQRankSum') && MQRankSum < -12.5))" \
+    --invalidate-previous-filters true
+  done
+  
+
+```
+
+
+
+### Parentage Assignment
+Using the genotype likelihoods calculated in the glimpse steps, I next used AlphaAssign to assign parents
+
+First let's merge the offspring and parents into a single vcf.
+```{bash eval=FALSE}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=par_assign
+#SBATCH --mem=2G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_par_assign.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_par_assign.txt
+#SBATCH --time=24:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load deprecated/bio/1.0
+
+## select one chromosome from Parent file
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+vcftools --vcf Smelt_Parents_fil4.HWE.recode.vcf --chr NC_061060.1 --out Smelt_Parents_fil4.HWE.NC_061060.1 --recode --recode-INFO-all
+
+module load bcftools/1.13
+#bgzip -@ 8 Smelt_Parents_fil4.HWE.NC_061060.1.recode.vcf
+#gatk IndexFeatureFile -I Smelt_Parents_fil4.HWE.NC_061060.1.recode.vcf.gz
+
+
+## merge parents and offspring together
+## run this then make sure each file is on its own line
+echo Smelt_Parents_fil4.HWE.NC_061060.1.recode.vcf.gz /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/GL_vcfs/merged/merged.NC_061060.1.vcf.gz > parent_offspring_NC_061060.1_list
+
+module load bcftools/1.13
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+
+bcftools merge -m none -r NC_061060.1 -Oz -o parent_offspring.merged.NC_061060.1.vcf.gz -l parent_offspring_NC_061060.1_list
+bcftools index -f parent_offspring.merged.NC_061060.1.vcf.gz
+
+## PLINK
+module load deprecated/plink/1.90
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+
+plink --vcf parent_offspring.merged.NC_061060.1.vcf.gz --recode --double-id --allow-extra-chr --out AlphaAssign/parent_offspring.merged.NC_061060.1.plink
+
+##Before moving on, edit the next steps in the map file on the command line next!
+`:s/NC_//g`  #this should only change the first line, do this as a check before changing whole document
+`:%s/NC_//g`
+`:s/\.1//g`
+`:%s/\.1//g`
+
+
+plink --file AlphaAssign/parent_offspring.merged.NC_061060.1.plink --allow-extra-chr --make-bed --double-id --out AlphaAssign/parent_offspring.merged.NC_061060.1.plink
+
+
+## AlphaAssign
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/snpArcher-main-parent/results/GCF_021917145.1_fHypTra1_genomic
+module load conda/base/latest
+
+pip install -r requirements.txt --user
+
+python /home/jsgriffi/RAD_abalone/AlphaAssign-Python/AlphaAssign.py \
+    bfile=parent_offspring.merged.NC_061060.1.plink \
+    potentialSires=SampleSire.txt \
+    potentialDams=SampleDam.txt \
+    out=Smelt_AlphaAssigned
+```
+
+
+
+whatshap check points:
+
+mawk '!/#/' A01_allLanes_P_fil.recode.vcf | wc -l
+2468195
+
+mawk '!/#/' A01_allLanes_P_phased.vcf | wc -l
+2468195
+
+mawk '!/#/' Smelt_Parents_phased.vcf | wc -l
+352949
+
+
+### GLIMPSE2 
+
+```{bash eval=FALSE}
+
+## split genome into chunks
+## test with one sample first
+module load glimpse2
+module load parallel/20220522
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/reference_panel
+
+#GLIMPSE2_chunk --input NC_061060.1.sites.vcf.gz --region NC_061060.1 --sequential --output chunks/chunks.NC_061060.1.txt --log NC_061060.1.log
+GLIMPSE2_chunk --input NW_025814041.1.sites.vcf.gz --region NW_025814041.1 --sequential --output chunks/chunks.NW_025814041.1.txt --log NW_025814041.1.log
+
+#this worked for smaller chromosomes so I reran all chromosomes with the modified parameters:
+GLIMPSE2_chunk --input NW_025814041.1.sites.vcf.gz --region NW_025814041.1 --sequential --output chunks/chunks.NW_025814041.1.txt --log NW_025814041.1.log --window-cm 0.5 --window-mb 0.5 --window-count 100 --buffer-cm 0.01 --buffer-mb 0.01 --buffer-count 10
+
+cat ../contig_names | parallel -j 8 "GLIMPSE2_chunk --input {}.sites.vcf.gz --sequential --region {} --output chunks/chunks.{}.txt --log chunks/{}.log"
+```
+
+
+
+Then we'll create a binary reference panel. Note that I keep getting errors when I tried running GLIMPSE2_chunk with the sequential algorithm. I had to run the following on the command line because I kept getting Illegal Instruction errors when submitting as a job:
+
+```{bash eval=FALSE}
+
+## create binary reference panel
+## test on one-two samples first
+GLIMPSE2_split_reference --reference ../phase_common/target.scaffold.NC_061060.1.bcf --input-region NC_061060.1:17193-7094666 --output-region NC_061060.1:17193-6094623 --output split/NC_061060.1
+
+GLIMPSE2_split_reference --reference ../phase_common/target.scaffold.NW_025814041.1.bcf --input-region NW_025814041.1:1-980017 --output-region NW_025814041.1:1-980017 --output NW_025814041.1
+
+module load glimpse2
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/reference_panel
+
+while IFS= read -r line; do
+        #echo $line
+        ./split_phased_ref.sh $line
+done < ../contig_names_phased
+```
+
+This is the code in the `split_phased_ref.sh` file:
+```{bash eval=FALSE}
+
+REF=/group/awhitehegrp2/joanna/Smelt_WGS/Analysis/phasing/phase_common/target.scaffold.${1}.bcf
+
+while IFS="" read -r LINE || [ -n "$LINE" ];
+do
+        printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+        IRG=$(echo $LINE | cut -d" " -f3)
+        ORG=$(echo $LINE | cut -d" " -f4)
+        GLIMPSE2_split_reference --reference $REF --input-region $IRG --output-region $ORG --output split/$1 --log split/$1
+done < chunks/chunks.${1}.txt
+```
+
+Now we are finally ready to phase the low-coverage individuals! See file glimpse_impute.sh
+```{bash eval=FALSE}
+
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=glimpse_impute
+#SBATCH --mem=60G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_glimpse_impute.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_glimpse_impute.txt
+#SBATCH --time=72:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+module load glimpse2
+
+##test with one chromosome first
+cd /group/awhitehegrp2/joanna/Smelt_WGS/
+
+REF=Analysis/phasing/reference_panel/split/NC_061060.1
+BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam
+
+while IFS="" read -r LINE || [ -n "$LINE" ]; 
+do   
+	printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+	IRG=$(echo $LINE | cut -d" " -f3)
+	ORG=$(echo $LINE | cut -d" " -f4)
+	CHR=$(echo ${LINE} | cut -d" " -f2)
+	REGS=$(echo ${IRG} | cut -d":" -f 2 | cut -d"-" -f1)
+	REGE=$(echo ${IRG} | cut -d":" -f 2 | cut -d"-" -f2)
+	OUT=Analysis/phasing/GLIMPSE_impute/NC_061060.1_imputed
+	GLIMPSE2_phase --bam-file ${BAM} --reference ${REF}_${CHR}_${REGS}_${REGE}.bin --output ${OUT}_${CHR}_${REGS}_${REGE}.bcf
+done < Analysis/phasing/reference_panel/chunks/chunks.NC_061060.1.txt
+
+##testing with different chromosome, but get the same error:
+cd /group/awhitehegrp2/joanna/Smelt_WGS/
+
+REF=Analysis/phasing/reference_panel/split/NC_061061.1
+BAM=snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam
+
+while IFS="" read -r LINE || [ -n "$LINE" ]; 
+do   
+	printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
+	IRG=$(echo $LINE | cut -d" " -f3)
+	ORG=$(echo $LINE | cut -d" " -f4)
+	CHR=$(echo ${LINE} | cut -d" " -f2)
+	REGS=$(echo ${IRG} | cut -d":" -f 2 | cut -d"-" -f1)
+	REGE=$(echo ${IRG} | cut -d":" -f 2 | cut -d"-" -f2)
+	OUT=Analysis/phasing/GLIMPSE_impute/NC_061061.1_imputed
+	GLIMPSE2_phase --bam-file ${BAM} --reference ${REF}_${CHR}_${REGS}_${REGE}.bin --output ${OUT}_${CHR}_${REGS}_${REGE}.bcf
+done < Analysis/phasing/reference_panel/chunks/chunks.NC_061061.1.txt
+```
+
+
+
+Some error output from above:
+Positional Burrows Wheeler Transform (PBWT)
+```{bash eval=FALSE}
+[GLIMPSE2] Phase and impute low coverage sequencing data
+  * Authors              : Simone RUBINACCI & Olivier DELANEAU, University of Lausanne
+  * Contact              : simone.rubinacci@unil.ch & olivier.delaneau@unil.ch
+  * Version              : GLIMPSE2_phase v2.0.0 / commit =  / release =
+  * Citation             : BiorXiv, (2022). DOI: https://doi.org/10.1101/2022.11.28.518213
+  *                      : Nature Genetics 53, 120–126 (2021). DOI: https://doi.org/10.1038/s41588-020-00756-0
+  * Run date             : 21/07/2023 - 12:22:24
+
+Files:
+  * Input BAM/CRAM       : [snpArcher/results/GCF_021917145.1_fHypTra1_genomic/bams/A02_plate01_final.bam]
+  * Reference binary     : [Analysis/phasing/reference_panel/split/NC_061060.1_NC_061060.1_770746_3455109.bin]
+  * Output file          : [Analysis/phasing/GLIMPSE_impute/NC_061060.1_imputed_NC_061060.1_770746_3455109.bcf]
+  * Output format        : [BCF format | ZLIB compression]
+
+GLIMPSE_phase parameters:
+  * Imputation model     : [Reference panel imputation]
+  * Input region         : [Given by binary reference panel]
+  * Output region        : [Given by binary reference panel]
+  * Sparse MAF           : [Given by binary reference panel]
+  * Recombination rates  : [Given by binary reference panel]
+  * Ploidy               : [Only diploid samples in region]
+  * Keep monom. ref sites: [NO]
+
+Model parameters:
+  * #Burnin iterations   : [5]
+  * #Main iterations     : [15]
+  * Ne [eff. pop. size]  : [100000]
+  * Phase error rate     : [0.0001]
+  * Imputation error rate: [1e-12]
+  * Min value for hap GLs: [1e-10]
+
+Selection parameters:
+  * K init               : [1000]
+  * K pbwt               : [2000]
+  * PBWT depth           : [12]
+  * PBWT modulo (cM)     : [0.1]
+  * State list           : [No list provided]
+
+Genotype calling:
+  * Calling model        : [standard]
+  * Perform calling]
+
+BAM/CRAM filters and options:
+  * Min mapping quality  : [10]
+  * Min base quality     : [10]
+  * Max depth            : [40]
+  * Keep failed QC       : [NO]
+  * Keep orphan reads    : [NO]
+  * Keep duplicate reads : [NO]
+  * Keep supp. alignment : [NO]
+  * Check pairing        : [NO]
+  * Ignore orientation   : [NO]
+  * Illumina-1.3+        : [NO]
+
+Other parameters
+  * Seed                 : [15052011]
+  * #Threads             : [1]
+
+Initialisation:
+  * Binary reference panel parsing [done] (0.02s)
+  * Binary reference panel [Nrh=174] [L=16696] [Lrare= 0 (0.0%) - Lcommon= 16696 (100.0%)]
+  * Input region         : [NC_061060.1:770746-3455109]
+  * Output region        : [NC_061060.1:1772275-2455104]
+  * Sparse MAF           : [0.001]
+  * Reading BAM files
+  * Reading BAM files done (0.13s)
+  * Coverage statistics reported in: [Analysis/phasing/GLIMPSE_impute/NC_061060.1_imputed_NC_061060.1_770746_3455109_stats_coverage.txt.gz]
+  * Avg. sequencing coverage: 1.223646
+  * RARE transpose Ref (0.00s)
+  * Region spans 2684364 bp and 2.68 cM
+  * No PBWT allocated (Kpbwt=0 or Kpbwt >= n_ref_haps)
+
+Initializing iteration
+  * Init rare Tar [#non-ref gls: 0] (0.00s)
+  * HMM imputation [#states=174.0 / %poly=100.0%] (0.05s)
+
+Burn-in iteration [1/5]
+  * HAP update Tar (0.00s)
+  * RARE transpose Tar (0.00s)
+  * No PBWT selection (Kpbwt=0 or Kpbwt >= n_ref_haps)
+
+ERROR: States for individual 0 are zero. Error during selection.
+
+```
+
+
+### GWAS correlations: SUPERGNOVA 
+(https://github.com/qlu-lab/SUPERGNOVA?tab=readme-ov-file)
+ 
+ Downloaded test dataset following GitHub instructions
+
+`module load conda/default`
+`module load python/3.11.9`
+`conda create -n supergnova_env python=3.11.9 -y`
+`conda activate supergnova_env`
+`conda install pandas numpy scipy bitarray scikit-learn -y`
+conda install numpy=1.23 bitarray=2.6.0 -y
+
+Run:
+`python3 supergnova.py ./data/sumstats/ASD.txt.sumstats.gz ./data/sumstats/CP.txt.sumstats.gz --N1 46351 --N2 257828 --bfile data/bfiles/eur_chr@_SNPmaf5 --partition data/partition/eur_chr@.bed --out results.txt`
+
+
+Got this error while running test dataset:
+raceback (most recent call last):
+  File "/group/awhitehegrp2/joanna/Smelt_WGS/SUPERGNOVA/supergnova.py", line 36, in <module>
+    pd.set_option('precision', 4)
+  File "/home/jsgriffi/.conda/envs/supergnova_env/lib/python3.11/site-packages/pandas/_config/config.py", line 274, in __call__
+    return self.__func__(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jsgriffi/.conda/envs/supergnova_env/lib/python3.11/site-packages/pandas/_config/config.py", line 167, in _set_option
+    key = _get_single_key(k, silent)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jsgriffi/.conda/envs/supergnova_env/lib/python3.11/site-packages/pandas/_config/config.py", line 134, in _get_single_key
+    raise OptionError("Pattern matched multiple keys")
+pandas._config.config.OptionError: Pattern matched multiple keys
+
+ChatGPT told me to change line 36 of supergnova.py:
+This: pd.set_option('precision', 4)
+To this: pd.set_option('display.precision', 4)
+
+
+
+### GWAS correlations: Trying LD Score instead
+https://github.com/bulik/ldsc
+
+`git clone https://github.com/bulik/ldsc.git`
+`module load conda/default`
+`cd ldsc`
+`conda env create --file environment.yml`
+`source activate ldsc`
+
+
+Estimate LD scores first
+https://github.com/bulik/ldsc/wiki/LD-Score-Estimation-Tutorial
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=ldsc
+#SBATCH --mem=10G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_ldsc.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_ldsc.txt
+#SBATCH --time=172:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+#module load plink/1.9-beta7.1
+#cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+#plink --vcf all_chr_offspring_imputed.filt3.vcf.gz --allow-extra-chr --double-id --recode --out all_chr_offspring_imputed.filt3
+#plink --file all_chr_offspring_imputed.filt3 --allow-extra-chr --make-bed --recode --out all_chr_offspring_imputed.filt3
+
+
+module load conda/base/latest
+source activate ldsc
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/ldsc
+
+python ldsc.py --bfile /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated/all_chr_offspring_imputed.filt3 --l2 --ld-wind-kb 100 --out all_chr_offspring_imputed.filt3.ldsc
+
+## createe snp list for merging, run these on command line
+awk '{print $2}' all_chr_offspring_imputed.filt3.ldsc.l2.ldscore > all_snps.snplist
+awk -F"_" 'BEGIN{OFS="\t"; print "SNP","A1","A2"}
+{
+  n = split($0, a, "_");
+  if(n < 4) { print $0, "NA", "NA"; next }
+  allele2 = a[n];
+  allele1 = a[n-1];
+  print $0, allele1, allele2
+}' all_snps.snplist > all_snps.merge
+
+
+
+##merge alleles properly
+python munge_sumstats.py --sumstats gwas_ctmax_genotype_ldsc --merge-alleles all_snps.merge --out gwas_ctmax_genotype.sumstats
+
+python munge_sumstats.py --sumstats gwas_ctmax_gxe_ldsc --merge-alleles all_snps.merge --out gwas_ctmax_gxe.sumstat
+
+python munge_sumstats.py --sumstats gwas_DI_ldsc --merge-alleles all_snps.merge --out gwas_DI_genotype
+
+python munge_sumstats.py --sumstats gwas_FL_ldsc --merge-alleles all_snps.merge --out gwas_FL_genotype
+
+python munge_sumstats.py --sumstats gwas_FL_gxe_ldsc --merge-alleles all_snps.merge --out gwas_FL_gxe_genotype
+
+
+python ldsc.py --rg gwas_ctmax_genotype.sumstats.gz,gwas_ctmax_gxe.sumstats.gz,gwas_DI_genotype.sumstats.gz,gwas_FL_genotype.sumstats.gz,gwas_FL_gxe_genotype.sumstats.gz --ref-ld all_chr_offspring_imputed.filt3.ldsc --w-ld all_chr_offspring_imputed.filt3.ldsc --out ctmax_genotype_gxe_ldsc
+
+python ldsc.py --rg gwas_ctmax_gxe.sumstats.gz,gwas_DI_genotype.sumstats.gz,gwas_FL_genotype.sumstats.gz,gwas_FL_gxe_genotype.sumstats.gz --ref-ld all_chr_offspring_imputed.filt3.ldsc --w-ld all_chr_offspring_imputed.filt3.ldsc --out ctmax_gxe_ldsc
+
+python ldsc.py --rg gwas_DI_genotype.sumstats.gz,gwas_FL_genotype.sumstats.gz,gwas_FL_gxe_genotype.sumstats.gz --ref-ld all_chr_offspring_imputed.filt3.ldsc --w-ld all_chr_offspring_imputed.filt3.ldsc --out DI_ldsc
+
+conda deactivate
+
+date
+exit
+```
+
+
+
+### GWAS correlations: GCTA try
+https://yanglab.westlake.edu.cn/software/gcta/#Inputandoutput
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH -D /home/jsgriffi
+#SBATCH --job-name=ldsc
+#SBATCH --mem=10G
+#SBATCH --ntasks=8
+#SBATCH -o /group/awhitehegrp2/joanna/Smelt_WGS/output_files/out-%A.%a_ldsc.txt
+#SBATCH -e /group/awhitehegrp2/joanna/Smelt_WGS/output_files/error-%A.%a_ldsc.txt
+#SBATCH --time=172:00:00
+#SBATCH --mail-user=jsgriffiths@ucdavis.edu
+#SBATCH --mail-type=ALL
+#SBATCH -p high
+
+
+#module load plink/1.9-beta7.1
+#cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+#plink --vcf all_chr_offspring_imputed.filt3.vcf.gz --allow-extra-chr --double-id --recode --out all_chr_offspring_imputed.filt3
+#plink --file all_chr_offspring_imputed.filt3 --allow-extra-chr --make-bed --recode --out all_chr_offspring_imputed.filt3
+
+## First change chr names to numbers, gcta doesn't like letters in chromosome name, run on command line
+awk 'BEGIN{FS=OFS="\t"} NR==FNR {gsub("\r","",$0); map[$2]=$1; next} {gsub("\r","",$0); if($1 in map) $1=map[$1]; print}' DS_chr_num_names.txt all_chr_offspring_imputed.filt3.bim > all_chr_offspring_imputed.filt3.gcta.bim
+
+cp all_chr_offspring_imputed.filt3.bed all_chr_offspring_imputed.filt3.gcta.bed
+cp all_chr_offspring_imputed.filt3.fam all_chr_offspring_imputed.filt3.gcta.fam
+
+
+
+module load gcta/1.91.2
+
+# generate _grm.grm.bin / .grm.id / .grm
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GLIMPSE_imputed/ligated
+
+gcta64 --bfile all_chr_offspring_imputed.filt3.gcta --autosome --make-grm --grm-adj 1 --thread-num 8 --out all_chr_offspring_imputed.filt3.gcta
+
+cd /group/awhitehegrp2/joanna/Smelt_WGS/Analysis/GCTA
+gcta64 --grm all_chr_offspring_imputed.filt3.gcta \
+  --pheno pheno_CTM_DI_file.txt \
+  --reml-bivar 1 2 \
+  --qcovar System_covar_file.txt \
+  --out CTmaxGxE_DI_bivar
+
+
+```
+
+setwd("C:/Users/joann/OneDrive/Documents/UCDavis/Whitehead_lab/Smelt_sequencing/2021_spawning/Analyses/GWAS")
+bim <- read.delim2("all_chr_offspring_imputed.filt3.bim", header=F)
+colnames(bim) <- c("chr", "snp", "V3", "V4", "V5", "V6")
+names <- read.delim2("DS_chr_num_names.txt", header=F)
+colnames(names) <- c("chr_num", "chr")
+
+bim2 <- merge(bim, names, by="chr", all.x = T)
+bim2 <- bim2[,c(7,2,3,4,5,6)]
+write.table(bim2,file = "all_chr_offspring_imputed.filt3.gcta.bim", quote = F,row.names = F,col.names = T, sep = "\t") #then delete header in vim
