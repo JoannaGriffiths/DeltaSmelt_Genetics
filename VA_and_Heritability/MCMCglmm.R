@@ -797,6 +797,31 @@ plot2 <- ggplot(data=heritability, aes(x=DI, y=h2, color= temp)) +
         strip.background = element_blank(), strip.placement = "outside", strip.text = element_text(size=14)) 
 coord_cartesian(ylim = 0:0.5)
 
+## Evolvability, model without fl
+temp <- c("15", "18", "15", "18", "15", "18", "15", "18")
+DI <- factor(c("All", "All", "L", "L", "M", "M", "H", "H"), levels=c("All", "L","M", "H"))
+h2 <- c(0.2596702, 0.06512294, 0.1672319, 0.08204916, 0.2266543, 0.1095768, 0.1515815, 0.03811622)
+lower <- c(0.1369523, 0.03812755, 0.05412295, 0.02450536, 0.08839724, 0.04628809, 0.04602467, 0.02071461)
+upper <- c(0.3556641, 0.1108644, 0.8647676, 0.2170645, 0.4065484, 0.2106581, 0.3749894, 0.09912414)
+
+
+
+# Combine vectors into a data frame
+heritability <- data.frame(h2, lower, upper, temp, DI)
+
+windows()
+plot3 <- ggplot(data=heritability, aes(x=DI, y=h2, color= temp)) +
+  geom_point(stat="identity", position=position_dodge(0.5), size = 3) +
+  geom_errorbar(data=heritability, aes(ymin=lower, ymax=upper), width=0, linewidth = 1, position=position_dodge(0.5)) +
+  scale_color_manual(values=c("lightsteelblue4", "lightsalmon4")) +
+  labs(y=expression("Coeff. of Genetic Variation (%)"), x="", fill="") +
+  #geom_text(data = generate_label_df(posthoc1, 'lev'), aes(x = plot.labels, y = V1, label = labels)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        axis.text = element_text(size=14), axis.title = element_text(size=14), legend.text = element_text(size=14), legend.position = "none",
+        strip.background = element_blank(), strip.placement = "outside", strip.text = element_text(size=14)) 
+coord_cartesian(ylim = 0:0.5)
 
 
 #################
@@ -1042,7 +1067,7 @@ ad_gen_var2$lower <- as.numeric(ad_gen_var2$lower)
 ad_gen_var2$upper <- as.numeric(ad_gen_var2$upper)
 
 windows()
-plot3 <- ggplot(data=ad_gen_var2, aes(x=DI, y=va, color= temp)) +
+plot4 <- ggplot(data=ad_gen_var2, aes(x=DI, y=va, color= temp)) +
   geom_point(stat="identity", position=position_dodge(0.5), size = 3) +
   geom_errorbar(data=ad_gen_var2, aes(ymin=lower, ymax=upper), width=0, linewidth=1, position=position_dodge(0.5)) +
   scale_color_manual(values=c("lightsteelblue4", "lightsalmon4")) +
@@ -1070,7 +1095,7 @@ upper <- c(0.7448825, 0.6771461, 0.5111179, 0.5131906, 0.7996708, 0.8992364, 0.8
 heritability2 <- data.frame(h2, lower, upper, temp, DI)
 
 windows()
-plot4 <- ggplot(data=heritability2, aes(x=DI, y=h2, color= temp)) +
+plot5 <- ggplot(data=heritability2, aes(x=DI, y=h2, color= temp)) +
   geom_point(stat="identity", position=position_dodge(0.5), size = 3) +
   geom_errorbar(data=heritability2, aes(ymin=lower, ymax=upper), width=0, linewidth=1, position=position_dodge(0.5)) +
   scale_color_manual(values=c("lightsteelblue4", "lightsalmon4")) +
@@ -1083,8 +1108,34 @@ plot4 <- ggplot(data=heritability2, aes(x=DI, y=h2, color= temp)) +
         strip.background = element_blank(), strip.placement = "outside", strip.text = element_text(size=14), legend.position = "none") 
 #coord_cartesian(ylim = 0:0.5)
 
+## Evolvability
+temp <- c("15", "18","15", "18", "15", "18", "15", "18", "15", "18")
+DI <- factor(c("All", "All","All.Dam", "All.Dam", "L", "L", "M", "M", "H", "H"), levels=c("All", "All.Dam", "L","M", "H"))
+h2 <- c(0.7816576, 0.7441232, 0.4858595, 0.6525496, 0.4260335, 0.9832069, 1.162496, 0.7575702, 0.5978339, 0.9429375)
+lower <- c(0.4980565, 0.5729288, 0.2684277, 0.3714167, 0.234068, 0.4466539, 0.5993086, 0.3818246, 0.2679136, 0.4368071)
+upper <- c(1.160729, 1.421189, 0.794027, 1.048118, 0.831465, 1.916819, 1.566284, 1.59959, 1.137799, 2.074198)
+
+
+
+# Combine vectors into a data frame
+heritability <- data.frame(h2, lower, upper, temp, DI)
+
+windows()
+plot6 <- ggplot(data=heritability, aes(x=DI, y=h2, color= temp)) +
+  geom_point(stat="identity", position=position_dodge(0.5), size = 3) +
+  geom_errorbar(data=heritability, aes(ymin=lower, ymax=upper), width=0, linewidth = 1, position=position_dodge(0.5)) +
+  scale_color_manual(values=c("lightsteelblue4", "lightsalmon4")) +
+  labs(y=expression("Coeff. of Genetic Variation (%)"), x="", fill="") +
+  #geom_text(data = generate_label_df(posthoc1, 'lev'), aes(x = plot.labels, y = V1, label = labels)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        axis.text = element_text(size=14), axis.title = element_text(size=14), legend.text = element_text(size=14), legend.position = "none",
+        strip.background = element_blank(), strip.placement = "outside", strip.text = element_text(size=14)) 
+coord_cartesian(ylim = 0:0.5)
+
 
 
 
 windows()
-plot_grid(plot1, plot2, plot3, plot4, labels = "AUTO")
+plot_grid(plot1, plot2, plot3, plot4,plot5, plot6, labels = "AUTO")
